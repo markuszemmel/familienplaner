@@ -480,13 +480,13 @@
         // Automatisches Aktualisieren beim Zurückkehren aus der Kalender-App
         document.addEventListener("visibilitychange", function() {
             if (document.visibilityState === "visible") {
-                fetchCalendarEvents(true);
+                fetchCalendarEvents();
             }
         });
 
         window.addEventListener("pageshow", function(event) {
             if (event.persisted) {
-                fetchCalendarEvents(true);
+                fetchCalendarEvents();
             }
         });
 
@@ -561,12 +561,13 @@
             document.getElementById(modalId).style.display = "none";
         }
 
-        function fetchCalendarEvents(forceRefresh = false) {
-            if (fetchedEvents.length === 0 || forceRefresh) {
+        function fetchCalendarEvents() {
+            if (fetchedEvents.length === 0) {
                 document.getElementById("monthYearDisplay").innerText = "Lade Daten...";
             }
             
-            const urlWithCacheBuster = SCRIPT_URL + (forceRefresh ? "?nocache=" + new Date().getTime() : "");
+            // Zwingt den Browser bei JEDER Anfrage, frische Daten von Google zu holen (kein Caching!)
+            const urlWithCacheBuster = SCRIPT_URL + "?nocache=" + new Date().getTime();
 
             fetch(urlWithCacheBuster)
                 .then(response => response.json())
