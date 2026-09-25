@@ -535,10 +535,14 @@
                 });
         }
 
-        // Generiert einen direkten Android Intent-Link für die Kalender App
-        function getAndroidCalendarIntentLink(startDate) {
-            const timeInMs = new Date(startDate).getTime();
-            return `intent://com.android.calendar/time/${timeInMs}#Intent;scheme=content;type=time/epoch;end=1000;S.title=Termin;package=com.google.android.calendar;action=android.intent.action.VIEW;end`;
+        // Öffnet direkt die Android Google Kalender App im Vorbereiten/Bearbeiten-Modus
+        function getAndroidCalendarIntentLink(title, startDate, endDate) {
+            const formatGDate = (d) => new Date(d).toISOString().replace(/-|:|\.\d\d\d/g, "");
+            const s = formatGDate(startDate);
+            const e = formatGDate(endDate || startDate);
+            const encodedTitle = encodeURIComponent(title);
+            
+            return `intent://calendar/event?action=VIEW&title=${encodedTitle}&dates=${s}/${e}#Intent;scheme=https;package=com.google.android.calendar;end`;
         }
 
         function renderCalendar() {
@@ -602,8 +606,8 @@
                                 timeHtml = `<span class="time-badge">🕒 ${hours}:${minutes}</span>`;
                             }
 
-                            const androidUrl = getAndroidCalendarIntentLink(event.start);
-                            const bellBtn = `<a href="${androidUrl}" class="reminder-bell" title="In Kalender App öffnen">🔔</a>`;
+                            const bellUrl = getAndroidCalendarIntentLink(titleText, event.start, event.end);
+                            const bellBtn = `<a href="${bellUrl}" class="reminder-bell" title="In Kalender App öffnen">🔔</a>`;
 
                             const title = timeHtml + titleText + bellBtn;
                             const colorId = event.color; 
