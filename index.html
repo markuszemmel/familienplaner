@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Familienplaner - Google Kalender</title>
+    <style>
+        :root {
+            --bg-color: #eaf2ed;
+            --container-bg: #f7faf8;
+            --grid-line: #c5d8cc;
+            --header-green: #2d5a3f;
+            --accent-green: #87a996;
+            --weekend-bg: #e2ede7;
+            --today-bg: #fff8e1;
+
+            --color-mama: #7986cb;
+            --color-jonathan: #8e24aa;
+            --color-clara: #e67c73;
+            --color-papa: #616161;
+            --color-geburtstag: #f6bf26;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 5px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .calendar-card {
+            background-color: var(--container-bg);
+            width: 100%;
+            max-width: 1250px;
+            border: 2px solid var(--header-green);
+            border-radius: 6px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            padding: 10px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 10px;
+            border-bottom: 2px dashed var(--accent-green);
+            padding-bottom: 8px;
+        }
+
+        h1 {
+            margin: 0 0 6px 0;
+            font-size: 1.4rem;
+            color: var(--header-green);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+            width: 100%;
+        }
+
+        .nav-btn {
+            background-color: var(--header-green);
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .action-buttons-row {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn-green {
+            background-color: var(--header-green);
+            color: white;
+            border: none;
+            padding: 5px 9px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.72rem;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+
+        .today-btn-orange {
+            background-color: #f57c00;
+            color: white;
+            border: none;
+            padding: 5px 11px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.72rem;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+
+        .month-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .table-container {
+            max-height: 75vh;
+            overflow-y: auto;
+            border: 1px solid var(--grid-line);
+            background: #fff;
+            scroll-behavior: smooth;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            background: #fff;
+        }
+
+        th, td {
+            border: 1px solid var(--grid-line);
+            padding: 4px 5px;
+            vertical-align: middle;
+            font-size: 0.75rem;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        thead th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background-color: var(--header-green);
+            color: white;
+            text-align: center;
+            font-size: 0.8rem;
+            padding: 8px 2px;
+            text-transform: uppercase;
+        }
+
+        .col-tag { width: 48px; }         
+        .col-mama { width: 18%; }         
+        .col-jonathan { width: 23%; }     
+        .col-clara { width: 18%; }        
+        .col-papa { width: 18%; }         
+        .col-geburtstag { width: 18%; }   
+
+        .day-col {
+            text-align: center;
+            background-color: #f0f7f3;
+            font-weight: bold;
+            color: #333;
+            position: relative;
+        }
+
+        .weekend td {
+            background-color: var(--weekend-bg);
+        }
+        .weekend .day-col {
+            background-color: #d2e4d9;
+        }
+
+        tr.holiday-row td {
+            background-color: #f0f6ff !important; 
+        }
+        tr.holiday-row .day-col {
+            background-color: #e0eeff !important;
+        }
+
+        tr.today-row td {
+            background-color: var(--today-bg) !important;
+        }
+        tr.today-row .day-col {
+            background-color: #ffe082 !important;
+            color: #2d5a3f;
+            border-left: 4px solid var(--header-green);
+        }
+
+        .wooden-peg {
+            display: inline-block;
+            width: 11px;
+            height: 13px;
+            vertical-align: middle;
+            margin-right: 1px;
+        }
+
+        .date-num {
+            font-size: 0.85rem;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .date-day {
+            font-size: 0.65rem;
+            color: #666;
+            display: block;
+        }
+
+        .weather-info {
+            font-size: 0.6rem;
+            color: #2d5a3f;
+            margin-top: 1px;
+            line-height: 1;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 1px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.6);
+        }
+        .weather-info:hover {
+            background: #e0eeff;
+        }
+
+        .holiday-label {
+            font-size: 0.55rem;
+            color: #1c5295;
+            margin-top: 2px;
+            line-height: 1.1;
+            font-weight: bold;
+            word-break: break-word;
+        }
+
+        .appointment {
+            background: #f9fbf9;
+            border-left: 3px solid var(--accent-green);
+            padding: 3px;
+            font-size: 0.7rem;
+            border-radius: 2px;
+            margin-bottom: 2px;
+            line-height: 1.2;
+            position: relative;
+        }
+
+        .appointment.mama { border-left-color: var(--color-mama); }
+        .appointment.jonathan { border-left-color: var(--color-jonathan); }
+        .appointment.clara { border-left-color: var(--color-clara); }
+        .appointment.papa { border-left-color: var(--color-papa); }
+        .appointment.geburtstag { border-left-color: var(--color-geburtstag); background: #fffde7; }
+
+        .appointment-all {
+            background: #fef3e6;
+            border-left: 3px solid #e6953b; 
+            padding: 3px 5px;
+            font-size: 0.7rem;
+            border-radius: 2px;
+            font-weight: bold;
+            color: #8c520a;
+            text-align: center;
+            margin-bottom: 2px;
+            line-height: 1.2;
+        }
+
+        .reminder-bell {
+            font-size: 0.75rem;
+            cursor: pointer;
+            margin-left: 4px;
+            opacity: 0.9;
+            text-decoration: none;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .time-badge {
+            font-size: 0.6rem; 
+            font-weight: bold; 
+            color: #555; 
+            display: block; 
+            margin-bottom: 1px;
+        }
+        
+        .shared-row-cell {
+            background-color: transparent; 
+            border-bottom: none !important;
+            padding-bottom: 1px;
+        }
+        
+        .individual-row-cell {
+            border-top: none !important;
+            padding-top: 1px;
+            background-color: transparent; 
+        }
+
+        /* Modal / Pop-Up Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            max-width: 300px;
+            width: 85%;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border: 2px solid var(--header-green);
+        }
+        .modal-content h3 {
+            margin-top: 0;
+            color: var(--header-green);
+            font-size: 1.1rem;
+        }
+        .modal-item {
+            font-size: 0.82rem;
+            margin: 8px 0;
+            color: #333;
+            text-align: left;
+            border-bottom: 1px dashed #ddd;
+            padding-bottom: 4px;
+            line-height: 1.35;
+        }
+        .close-btn {
+            background-color: var(--header-green);
+            color: white;
+            border: none;
+            padding: 6px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 12px;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 0; }
+            .calendar-card { border: none; border-radius: 0; padding: 5px; }
+            h1 { font-size: 1.2rem; }
+            th, td { font-size: 0.7rem; padding: 3px 2px; }
+            thead th { font-size: 0.7rem; padding: 6px 1px; }
+            .col-tag { width: 44px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calendar-card">
+        <header>
+            <h1>Familienplaner</h1>
+            <div class="nav-bar">
+                <button class="nav-btn" onclick="changeMonth(-1)">◀ Zurück</button>
+                <div class="month-title" id="monthYearDisplay">Lade Daten...</div>
+                <button class="nav-btn" onclick="changeMonth(1)">Vor ▶</button>
+            </div>
+            <div class="action-buttons-row">
+                <button class="action-btn-green" onclick="checkUpcomingEvents()">📅 Nächste Termine</button>
+                <button class="today-btn-orange" onclick="goToToday()">📍 Heute</button>
+                <button class="action-btn-green" onclick="checkUpcomingBirthdays()">🎂 Geburtstage</button>
+            </div>
+        </header>
+
+        <div class="table-container" id="tableContainer">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="col-tag">Tag</th>
+                        <th class="col-mama">Mama</th>
+                        <th class="col-jonathan">Jonathan</th>
+                        <th class="col-clara">Clara</th>
+                        <th class="col-papa">Papa</th>
+                        <th class="col-geburtstag"></th>
+                    </tr>
+                </thead>
+                <tbody id="calendarBody">
+                    <!-- Tage werden dynamisch geladen -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Wetter-Pop-Up -->
+    <div id="weatherModal" class="modal" onclick="closeModal('weatherModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3 id="modalDateTitle">Wetter-Vorschau</h3>
+            <div id="modalWeatherDetails"></div>
+            <button class="close-btn" onclick="closeModal('weatherModal')">Schließen</button>
+        </div>
+    </div>
+
+    <!-- Geburtstags-Übersicht Pop-Up -->
+    <div id="bdayModal" class="modal" onclick="closeModal('bdayModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3>🎂 Geburtstage (nächste 4 Wochen)</h3>
+            <div id="bdayList" style="max-height: 250px; overflow-y: auto; margin-top: 10px;"></div>
+            <button class="close-btn" onclick="closeModal('bdayModal')">Schließen</button>
+        </div>
+    </div>
+
+    <!-- Nächste Termine Pop-Up -->
+    <div id="eventsModal" class="modal" onclick="closeModal('eventsModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3>📅 Termine nächste 10 Tage</h3>
+            <div id="eventsList" style="max-height: 270px; overflow-y: auto; margin-top: 10px;"></div>
+            <button class="close-btn" onclick="closeModal('eventsModal')">Schließen</button>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxwEOyi1HThb_TD9R0ytHNKe0GPMyw7wT5SmFDVCb8uIKKVqclKAl3RCWWP5DaWOI06YA/exec";
+
+        const LAT = 48.65;
+        const LON = 9.29;
+
+        const monthsNames = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+        const daysNames = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
+
+        const todayObj = new Date();
+        let currentYear = todayObj.getFullYear();
+        let currentMonth = todayObj.getMonth();
+        let fetchedEvents = [];
+        let weatherData = {};
+
+        window.onload = function() {
+            const cachedData = localStorage.getItem("family_calendar_cache");
+            if (cachedData) {
+                try {
+                    fetchedEvents = JSON.parse(cachedData);
+                    renderCalendar();
+                } catch(e) {}
+            }
+            
+            fetchWeather();
+            fetchCalendarEvents();
+        };
+
+        function fetchWeather() {
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max,windspeed_10m_max&timezone=Europe%2FBerlin`;
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.daily) {
+                        for (let i = 0; i < data.daily.time.length; i++) {
+                            const dateStr = data.daily.time[i];
+                            const code = data.daily.weathercode[i];
+                            const tMax = Math.round(data.daily.temperature_2m_max[i]);
+                            const tMin = Math.round(data.daily.temperature_2m_min[i]);
+                            const rainProb = data.daily.precipitation_probability_max ? data.daily.precipitation_probability_max[i] : 0;
+                            const wind = data.daily.windspeed_10m_max ? Math.round(data.daily.windspeed_10m_max[i]) : 0;
+
+                            weatherData[dateStr] = { 
+                                icon: getWeatherIcon(code), 
+                                text: getWeatherText(code),
+                                tMax: tMax, 
+                                tMin: tMin,
+                                rainProb: rainProb,
+                                wind: wind
+                            };
+                        }
+                        renderCalendar();
+                    }
+                })
+                .catch(err => console.log("Wetter Fehler", err));
+        }
+
+        function getWeatherIcon(code) {
+            if (code === 0) return "☀️";
+            if (code >= 1 && code <= 3) return "⛅";
+            if (code >= 45 && code <= 48) return "🌫️";
+            if (code >= 51 && code <= 67) return "🌧️";
+            if (code >= 71 && code <= 77) return "❄️";
+            if (code >= 80 && code <= 82) return "🌦️";
+            if (code >= 95) return "🌩️";
+            return "🌡️";
+        }
+
+        function getWeatherText(code) {
+            if (code === 0) return "Sonnig";
+            if (code >= 1 && code <= 3) return "Leicht bewölkt";
+            if (code >= 45 && code <= 48) return "Nebel";
+            if (code >= 51 && code <= 67) return "Regen";
+            if (code >= 71 && code <= 77) return "Schnee";
+            if (code >= 80 && code <= 82) return "Regenschauer";
+            if (code >= 95) return "Gewitter";
+            return "Wettervorschau";
+        }
+
+        function showWeatherDetails(dateKey, formattedDate) {
+            const w = weatherData[dateKey];
+            if (!w) return;
+
+            document.getElementById("modalDateTitle").innerText = `Wetter am ${formattedDate}`;
+            document.getElementById("modalWeatherDetails").innerHTML = `
+                <div style="font-size: 2.2rem; margin: 5px 0;">${w.icon}</div>
+                <div style="font-size:0.85rem; margin: 4px 0;"><strong>Zustand:</strong> ${w.text}</div>
+                <div style="font-size:0.85rem; margin: 4px 0;"><strong>Höchstwert:</strong> ${w.tMax}°C</div>
+                <div style="font-size:0.85rem; margin: 4px 0;"><strong>Tiefstwert:</strong> ${w.tMin}°C</div>
+                <div style="font-size:0.85rem; margin: 4px 0;"><strong>Regenrisiko:</strong> ${w.rainProb}%</div>
+                <div style="font-size:0.85rem; margin: 4px 0;"><strong>Wind:</strong> bis zu ${w.wind} km/h</div>
+            `;
+            document.getElementById("weatherModal").style.display = "flex";
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+        }
+
+        function fetchCalendarEvents() {
+            if (fetchedEvents.length === 0) {
+                document.getElementById("monthYearDisplay").innerText = "Lade Daten...";
+            }
+            
+            fetch(SCRIPT_URL)
+                .then(response => response.json())
+                .then(data => {
+                    fetchedEvents = data || [];
+                    localStorage.setItem("family_calendar_cache", JSON.stringify(fetchedEvents));
+                    renderCalendar();
+                })
+                .catch(error => {
+                    console.error("Fehler beim Abrufen:", error);
+                    if (fetchedEvents.length === 0) {
+                        document.getElementById("monthYearDisplay").innerText = "Ladefehler!";
+                    }
+                });
+        }
+
+        // Öffnet die Android Kalender-App direkt am jeweiligen Tag (ohne Vorlagen-Duplikat!)
+        function openAndroidCalendarDay(startDate) {
+            const timeInMs = new Date(startDate).getTime();
+            window.location.href = `content://com.android.calendar/time/${timeInMs}`;
+        }
+
+        function renderCalendar() {
+            document.getElementById("monthYearDisplay").innerText = monthsNames[currentMonth] + " " + currentYear;
+            const tbody = document.getElementById("calendarBody");
+            tbody.innerHTML = "";
+
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+            const pegSvg = `
+                <svg class="wooden-peg" viewBox="0 0 20 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="1" width="5" height="26" rx="1" fill="#c29b62" stroke="#8a6838" stroke-width="1"/>
+                    <rect x="12" y="1" width="5" height="26" rx="1" fill="#c29b62" stroke="#8a6838" stroke-width="1"/>
+                    <circle cx="10" cy="12" r="3" fill="#717a8a"/>
+                    <rect x="2" y="11" width="16" height="2" fill="#9da3af"/>
+                </svg>
+            `;
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayOfWeek = new Date(currentYear, currentMonth, day).getDay();
+                const dayNameStr = daysNames[dayOfWeek];
+                const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+
+                const isToday = (day === todayObj.getDate() && currentMonth === todayObj.getMonth() && currentYear === todayObj.getFullYear());
+
+                let mamaHtml = "", jonathanHtml = "", claraHtml = "", papaHtml = "", geburtstagHtml = "";
+                let allHtml = ""; 
+                let dayLabels = ""; 
+                let isHoliday = false; 
+
+                const dayStart = new Date(currentYear, currentMonth, day, 0, 0, 0);
+                const dayEnd = new Date(currentYear, currentMonth, day, 23, 59, 59);
+
+                const mStr = String(currentMonth + 1).padStart(2, '0');
+                const dStr = String(day).padStart(2, '0');
+                const isoDateKey = `${currentYear}-${mStr}-${dStr}`;
+                const weather = weatherData[isoDateKey];
+                
+                let weatherHtml = "";
+                if (weather) {
+                    const formattedDate = `${day}.${currentMonth + 1}.`;
+                    weatherHtml = `<div class="weather-info" onclick="showWeatherDetails('${isoDateKey}', '${formattedDate}')">${weather.icon}${weather.tMax}°</div>`;
+                }
+
+                fetchedEvents.forEach(event => {
+                    const evStart = new Date(event.start);
+                    const evEnd = new Date(event.end);
+
+                    if (evStart <= dayEnd && evEnd > dayStart) {
+                        const titleText = event.title || "Termin";
+                        
+                        if (event.type === "holiday" || event.type === "ferien") {
+                            isHoliday = true;
+                            dayLabels += `<div class="holiday-label">🏖️ ${titleText}</div>`;
+                        } 
+                        else {
+                            let timeHtml = "";
+                            if (!event.allDay) {
+                                const hours = evStart.getHours().toString().padStart(2, '0');
+                                const minutes = evStart.getMinutes().toString().padStart(2, '0');
+                                timeHtml = `<span class="time-badge">🕒 ${hours}:${minutes}</span>`;
+                            }
+
+                            const bellBtn = `<span class="reminder-bell" onclick="openAndroidCalendarDay('${event.start}')" title="In Android Kalender App öffnen">🔔</span>`;
+
+                            const title = timeHtml + titleText + bellBtn;
+                            const colorId = event.color; 
+                            
+                            if (colorId === "1" || colorId === "#7986cb" || colorId === "#a4bdfc") { 
+                                mamaHtml += `<div class="appointment mama">${title}</div>`; 
+                            } 
+                            else if (colorId === "3" || colorId === "#8e24aa" || colorId === "#dbadff") { 
+                                jonathanHtml += `<div class="appointment jonathan">${title}</div>`; 
+                            } 
+                            else if (colorId === "4" || colorId === "#e67c73" || colorId === "#ff887c") { 
+                                claraHtml += `<div class="appointment clara">${title}</div>`; 
+                            } 
+                            else if (colorId === "5" || colorId === "#f6bf26" || colorId === "#fbd75b") { 
+                                geburtstagHtml += `<div class="appointment geburtstag">🎂 ${title}</div>`; 
+                            } 
+                            else if (colorId === "8" || colorId === "#616161" || colorId === "#e1e1e1") { 
+                                papaHtml += `<div class="appointment papa">${title}</div>`; 
+                            } 
+                            else {
+                                allHtml += `<div class="appointment-all">🌟 ${title}</div>`; 
+                            }
+                        }
+                    }
+                });
+
+                const pegHtml = isToday ? pegSvg : ``;
+
+                const firstColHtml = `
+                    ${pegHtml}<span class="date-num">${day}</span> 
+                    <span class="date-day">${dayNameStr.substring(0, 2)}</span>
+                    ${weatherHtml}
+                    ${dayLabels}
+                `;
+
+                if (allHtml !== "") {
+                    const row1 = document.createElement("tr");
+                    const row2 = document.createElement("tr");
+                    if (isWeekend) { row1.classList.add("weekend"); row2.classList.add("weekend"); }
+                    if (isHoliday) { row1.classList.add("holiday-row"); row2.classList.add("holiday-row"); }
+                    if (isToday) { row1.classList.add("today-row"); row2.classList.add("today-row"); row1.id = "todayElement"; }
+
+                    row1.innerHTML = `
+                        <td class="day-col col-tag" rowspan="2">${firstColHtml}</td>
+                        <td colspan="4" class="shared-row-cell">${allHtml}</td>
+                        <td class="col-geburtstag" rowspan="2">${geburtstagHtml}</td>
+                    `;
+
+                    row2.innerHTML = `
+                        <td class="col-mama individual-row-cell">${mamaHtml}</td>
+                        <td class="col-jonathan individual-row-cell">${jonathanHtml}</td>
+                        <td class="col-clara individual-row-cell">${claraHtml}</td>
+                        <td class="col-papa individual-row-cell">${papaHtml}</td>
+                    `;
+
+                    tbody.appendChild(row1);
+                    tbody.appendChild(row2);
+                } 
+                else {
+                    const row = document.createElement("tr");
+                    if (isWeekend) row.classList.add("weekend");
+                    if (isHoliday) row.classList.add("holiday-row");
+                    if (isToday) { row.classList.add("today-row"); row.id = "todayElement"; }
+                    
+                    row.innerHTML = `
+                        <td class="day-col col-tag">${firstColHtml}</td>
+                        <td class="col-mama">${mamaHtml}</td>
+                        <td class="col-jonathan">${jonathanHtml}</td>
+                        <td class="col-clara">${claraHtml}</td>
+                        <td class="col-papa">${papaHtml}</td>
+                        <td class="col-geburtstag">${geburtstagHtml}</td>
+                    `;
+                    tbody.appendChild(row);
+                }
+            }
+
+            setTimeout(() => {
+                const container = document.getElementById("tableContainer");
+                const isThisMonth = (currentMonth === todayObj.getMonth() && currentYear === todayObj.getFullYear());
+                const todayElem = document.getElementById("todayElement");
+
+                if (isThisMonth && todayElem) {
+                    todayElem.scrollIntoView({ behavior: "smooth", block: "center" });
+                } else if (container) {
+                    container.scrollTop = 0;
+                }
+            }, 300);
+        }
+
+        function goToToday() {
+            currentYear = todayObj.getFullYear();
+            currentMonth = todayObj.getMonth();
+            renderCalendar();
+        }
+
+        function checkUpcomingBirthdays() {
+            const now = new Date();
+            const in28Days = new Date();
+            in28Days.setDate(now.getDate() + 28);
+
+            let upcoming = [];
+
+            fetchedEvents.forEach(e => {
+                if (e.color === "5" || e.color === "#f6bf26" || e.color === "#fbd75b") {
+                    const evDate = new Date(e.start);
+                    if (evDate >= now && evDate <= in28Days) {
+                        const dayStr = evDate.getDate().toString().padStart(2, '0');
+                        const monthStr = (evDate.getMonth() + 1).toString().padStart(2, '0');
+                        upcoming.push({ name: e.title, date: `${dayStr}.${monthStr}.`, fullDate: evDate });
+                    }
+                }
+            });
+
+            upcoming.sort((a, b) => a.fullDate - b.fullDate);
+
+            const listContainer = document.getElementById("bdayList");
+            if (upcoming.length === 0) {
+                listContainer.innerHTML = `<div style="font-size:0.85rem; color:#666; padding:10px;">In den nächsten 4 Wochen stehen keine Geburtstage an.</div>`;
+            } else {
+                let html = "";
+                upcoming.forEach(item => {
+                    html += `<div class="modal-item">🎂 <strong>${item.date}</strong> - ${item.name}</div>`;
+                });
+                listContainer.innerHTML = html;
+            }
+            document.getElementById("bdayModal").style.display = "flex";
+        }
+
+        function checkUpcomingEvents() {
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+
+            let groupedList = [];
+
+            for (let i = 0; i < 10; i++) {
+                const checkDate = new Date(now);
+                checkDate.setDate(now.getDate() + i);
+
+                const dayStart = new Date(checkDate.getFullYear(), checkDate.getMonth(), checkDate.getDate(), 0, 0, 0);
+                const dayEnd = new Date(checkDate.getFullYear(), checkDate.getMonth(), checkDate.getDate(), 23, 59, 59);
+
+                const dayOfWeek = daysNames[checkDate.getDay()].substring(0, 2);
+                const dayStr = checkDate.getDate().toString().padStart(2, '0');
+                const monthStr = (checkDate.getMonth() + 1).toString().padStart(2, '0');
+                const dateHeader = `${dayOfWeek} ${dayStr}.${monthStr}.`;
+
+                let dayItems = [];
+
+                fetchedEvents.forEach(e => {
+                    if (e.type !== "holiday" && e.type !== "ferien" && e.color !== "5" && e.color !== "#f6bf26" && e.color !== "#fbd75b") {
+                        const evStart = new Date(e.start);
+                        const evEnd = new Date(e.end);
+
+                        if (evStart <= dayEnd && evEnd > dayStart) {
+                            let person = "Alle";
+                            const c = e.color;
+                            if (c === "1" || c === "#7986cb" || c === "#a4bdfc") person = "Mama";
+                            else if (c === "3" || c === "#8e24aa" || c === "#dbadff") person = "Jonathan";
+                            else if (c === "4" || c === "#e67c73" || c === "#ff887c") person = "Clara";
+                            else if (c === "8" || c === "#616161" || c === "#e1e1e1") person = "Papa";
+
+                            let timeStr = "";
+                            if (!e.allDay) {
+                                const hh = evStart.getHours().toString().padStart(2, '0');
+                                const mm = evStart.getMinutes().toString().padStart(2, '0');
+                                timeStr = ` (🕒 ${hh}:${mm})`;
+                            }
+
+                            dayItems.push(`${e.title} (${person})${timeStr}`);
+                        }
+                    }
+                });
+
+                if (dayItems.length > 0) {
+                    groupedList.push({
+                        header: dateHeader,
+                        items: dayItems
+                    });
+                }
+            }
+
+            const listContainer = document.getElementById("eventsList");
+            if (groupedList.length === 0) {
+                listContainer.innerHTML = `<div style="font-size:0.85rem; color:#666; padding:10px;">In den nächsten 10 Tagen stehen keine Anlässe an.</div>`;
+            } else {
+                let html = "";
+                groupedList.forEach(group => {
+                    const eventLines = group.items.join("<br>• ");
+                    html += `<div class="modal-item">📌 <strong>${group.header}</strong><br>• ${eventLines}</div>`;
+                });
+                listContainer.innerHTML = html;
+            }
+            document.getElementById("eventsModal").style.display = "flex";
+        }
+
+        function changeMonth(direction) {
+            currentMonth += direction;
+            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+            else if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+            renderCalendar(); 
+        }
+    </script>
+
+</body>
+</html>
