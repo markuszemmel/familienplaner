@@ -535,14 +535,14 @@
                 });
         }
 
-        // Öffnet direkt die Android Google Kalender App im Vorbereiten/Bearbeiten-Modus
-        function getAndroidCalendarIntentLink(title, startDate, endDate) {
-            const formatGDate = (d) => new Date(d).toISOString().replace(/-|:|\.\d\d\d/g, "");
-            const s = formatGDate(startDate);
-            const e = formatGDate(endDate || startDate);
-            const encodedTitle = encodeURIComponent(title);
+        // Öffnet die Google Kalender Web-Tagesansicht sauber im Browser am gewählten Datum
+        function getCalendarDayLink(startDate) {
+            const evDate = new Date(startDate);
+            const yyyy = evDate.getFullYear();
+            const mm = String(evDate.getMonth() + 1).padStart(2, '0');
+            const dd = String(evDate.getDate()).padStart(2, '0');
             
-            return `intent://calendar/event?action=VIEW&title=${encodedTitle}&dates=${s}/${e}#Intent;scheme=https;package=com.google.android.calendar;end`;
+            return `https://calendar.google.com/calendar/r/day/${yyyy}/${mm}/${dd}`;
         }
 
         function renderCalendar() {
@@ -606,8 +606,8 @@
                                 timeHtml = `<span class="time-badge">🕒 ${hours}:${minutes}</span>`;
                             }
 
-                            const bellUrl = getAndroidCalendarIntentLink(titleText, event.start, event.end);
-                            const bellBtn = `<a href="${bellUrl}" class="reminder-bell" title="In Kalender App öffnen">🔔</a>`;
+                            const bellUrl = getCalendarDayLink(event.start);
+                            const bellBtn = `<a href="${bellUrl}" target="_blank" class="reminder-bell" title="Kalendertag öffnen">🔔</a>`;
 
                             const title = timeHtml + titleText + bellBtn;
                             const colorId = event.color; 
