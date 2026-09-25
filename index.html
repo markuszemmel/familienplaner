@@ -45,12 +45,10 @@
     .actions-bar {
       display: flex;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
       margin-top: 5px;
     }
     .actions-bar button {
-      background-color: white;
-      color: var(--primary-color);
       border: none;
       padding: 6px 10px;
       font-size: 13px;
@@ -58,6 +56,10 @@
       border-radius: 4px;
       cursor: pointer;
     }
+    .btn-next { background-color: #27ae60; color: white; }
+    .btn-today { background-color: #e67e22; color: white; }
+    .btn-birthday { background-color: #27ae60; color: white; }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -80,6 +82,7 @@
       width: 15%;
       background-color: #fafafa;
       vertical-align: middle;
+      font-size: 12px;
     }
     .appointment {
       font-size: 11px;
@@ -88,6 +91,11 @@
       background: #e2f0d9;
       border-radius: 3px;
       text-align: left;
+    }
+    .weather-info {
+      font-size: 11px;
+      margin-top: 4px;
+      color: #555;
     }
     .fab {
       position: fixed;
@@ -117,9 +125,9 @@
       <button onclick="changeMonth(1)">Vor &gt;</button>
     </div>
     <div class="actions-bar">
-      <button onclick="goToNextEvents()">📅 Nächste</button>
-      <button onclick="goToToday()">📍 Heute</button>
-      <button onclick="openBirthdays()">🎂 Geburtstage</button>
+      <button class="btn-next" onclick="showNextEvents()">📅 Nächste</button>
+      <button class="btn-today" onclick="goToToday()">📍 Heute</button>
+      <button class="btn-birthday" onclick="showBirthdays()">🎂 Geburtstage</button>
     </div>
   </header>
 
@@ -147,15 +155,44 @@
     
     let currentDate = new Date();
     let cachedEvents = [];
+    let weatherData = {};
 
     async function fetchEvents() {
       try {
         let response = await fetch(SCRIPT_URL);
         cachedEvents = await response.json();
+        await fetchWeather();
         renderCalendar();
       } catch (error) {
         document.getElementById("month-year-title").innerText = "Ladefehler!";
       }
+    }
+
+    // Wetter für Wolfschlugen über kostenlose Open-Meteo API laden
+    async function fetchWeather() {
+      try {
+        let res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=48.65&longitude=9.32&daily=weathercode,temperature_2m_max&timezone=Europe%2FBerlin");
+        let data = await res.json();
+        if (data && data.daily) {
+          for (let i = 0; i < data.daily.time.length; i++) {
+            weatherData[data.daily.time[i]] = {
+              temp: Math.round(data.daily.temperature_2m_max[i]),
+              code: data.daily.weathercode[i]
+            };
+          }
+        }
+      } catch (e) {
+        console.log("Wetter konnte nicht geladen werden");
+      }
+    }
+
+    function getWeatherEmoji(code) {
+      if (code === 0) return "☀️";
+      if (code >= 1 && code <= 3) return "⛅";
+      if (code >= 45 && code <= 48) return "🌫️";
+      if (code >= 51 && code <= 67) return "🌧️";
+      if (code >= 71 && code <= 77) return "❄️";
+      return "☁️";
     }
 
     function renderCalendar() {
@@ -179,7 +216,12 @@
 
         let tdDay = document.createElement("td");
         tdDay.className = "day-cell";
-        tdDay.innerHTML = `${dayOfWeek}<br><strong>${day}</strong>`;
+        
+        let dateString = year + "-" + String(month + 1).padStart(2, '0') + "-" + String(day).padStart(2, '0');
+        let w = weatherData[dateString];
+        let weatherHtml = w ? `<div class="weather-info">${getWeatherEmoji(w.code)} ${w.temp}°</div>` : "";
+
+        tdDay.innerHTML = `${dayOfWeek}<br><strong>${day}</strong>${weatherHtml}`;
         
         let today = new Date();
         if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
@@ -239,12 +281,19 @@
       renderCalendar();
     }
 
-    function goToNextEvents() {
-      alert("Nächste Termine Ansicht.");
+    function showNextEvents() {
+      let next10Days = cachedEvents.filter(e => {
+        let d = new Date(e.start);
+        let now = new Date();
+        let diff = (d - now) / (1000 * 60 * 60 * 24);
+        return diff >= 0 && diff <= 10;
+      });
+      alert("Nächste 10 Tage:\n\n" + (next10Days.length > 0 ? next10Days.map(e => e.title).join("\n") : "Keine Termine in den nächsten 10 Tagen."));
     }
 
-    function openBirthdays() {
-      alert("Geburtstags-Ansicht folgt.");
+    function showBirthdays() {
+      let bdays = cachedEvents.filter(e => e.title.toLowerCase().includes("geburtstag"));
+      alert("Geburtstage (nächste Wochen/Monate):\n\n" + (bdays.length > 0 ? bdays.map(e => e.title).join("\n") : "Keine Geburtstage gefunden."));
     }
 
     fetchEvents();
