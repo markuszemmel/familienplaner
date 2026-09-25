@@ -38,6 +38,7 @@
             border-radius: 6px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             padding: 10px;
+            position: relative;
         }
 
         header {
@@ -294,6 +295,34 @@
             background-color: transparent; 
         }
 
+        /* Schwebender Button unten rechts (Floating Action Button) */
+        .fab-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            background-color: var(--header-green);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+            text-decoration: none;
+            z-index: 99;
+            opacity: 0.8;
+            transition: opacity 0.2s, transform 0.2s;
+            border: 2px solid white;
+        }
+        .fab-btn:hover, .fab-btn:active {
+            opacity: 1.0;
+            transform: scale(1.08);
+        }
+
         /* Modal / Pop-Up Styles */
         .modal {
             display: none;
@@ -350,6 +379,7 @@
             th, td { font-size: 0.7rem; padding: 3px 2px; }
             thead th { font-size: 0.7rem; padding: 6px 1px; }
             .col-tag { width: 44px; }
+            .fab-btn { bottom: 15px; right: 15px; width: 44px; height: 44px; font-size: 1.6rem; }
         }
     </style>
 </head>
@@ -388,6 +418,9 @@
             </table>
         </div>
     </div>
+
+    <!-- Schwebender + Button unten rechts zum Erstellen neuer Termine -->
+    <a href="https://calendar.google.com/calendar/render?action=TEMPLATE" target="_blank" class="fab-btn" title="Neuen Termin erstellen">+</a>
 
     <!-- Wetter-Pop-Up -->
     <div id="weatherModal" class="modal" onclick="closeModal('weatherModal')">
@@ -535,7 +568,7 @@
                 });
         }
 
-        // Öffnet die Google Kalender Web-Tagesansicht sauber im Browser am gewählten Datum
+        // Öffnet die Google Kalender Tagesansicht sauber im Browser am gewählten Datum
         function getCalendarDayLink(startDate) {
             const evDate = new Date(startDate);
             const yyyy = evDate.getFullYear();
