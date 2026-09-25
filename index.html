@@ -109,6 +109,18 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.15);
         }
 
+        .refresh-btn-blue {
+            background-color: #1976d2;
+            color: white;
+            border: none;
+            padding: 5px 9px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.72rem;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+
         .month-title {
             font-size: 1.1rem;
             font-weight: bold;
@@ -295,7 +307,7 @@
             background-color: transparent; 
         }
 
-        /* Schwebender Button unten rechts (Floating Action Button) */
+        /* Schwebender Button unten rechts */
         .fab-btn {
             position: fixed;
             bottom: 20px;
@@ -394,8 +406,9 @@
                 <button class="nav-btn" onclick="changeMonth(1)">Vor ▶</button>
             </div>
             <div class="action-buttons-row">
-                <button class="action-btn-green" onclick="checkUpcomingEvents()">📅 Nächste Termine</button>
+                <button class="action-btn-green" onclick="checkUpcomingEvents()">📅 Nächste</button>
                 <button class="today-btn-orange" onclick="goToToday()">📍 Heute</button>
+                <button class="refresh-btn-blue" onclick="fetchCalendarEvents(true)">🔄 Aktualisieren</button>
                 <button class="action-btn-green" onclick="checkUpcomingBirthdays()">🎂 Geburtstage</button>
             </div>
         </header>
@@ -413,13 +426,12 @@
                     </tr>
                 </thead>
                 <tbody id="calendarBody">
-                    <!-- Tage werden dynamisch geladen -->
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- Schwebender + Button unten rechts zum Erstellen neuer Termine -->
+    <!-- Schwebender + Button -->
     <a href="https://calendar.google.com/calendar/render?action=TEMPLATE" target="_blank" class="fab-btn" title="Neuen Termin erstellen">+</a>
 
     <!-- Wetter-Pop-Up -->
@@ -476,19 +488,6 @@
             fetchWeather();
             fetchCalendarEvents();
         };
-
-        // Automatisches Aktualisieren beim Zurückkehren aus der Kalender-App
-        document.addEventListener("visibilitychange", function() {
-            if (document.visibilityState === "visible") {
-                fetchCalendarEvents();
-            }
-        });
-
-        window.addEventListener("pageshow", function(event) {
-            if (event.persisted) {
-                fetchCalendarEvents();
-            }
-        });
 
         function fetchWeather() {
             const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max,windspeed_10m_max&timezone=Europe%2FBerlin`;
@@ -561,15 +560,15 @@
             document.getElementById(modalId).style.display = "none";
         }
 
-        function fetchCalendarEvents() {
-            if (fetchedEvents.length === 0) {
-                document.getElementById("monthYearDisplay").innerText = "Lade Daten...";
+        // Stabile Version ohne blockierende Hintergrund-Aktualisierungen
+        function fetchCalendarEvents(forceRefresh = false) {
+            const display = document.getElementById("monthYearDisplay");
+            
+            if (fetchedEvents.length === 0 || forceRefresh) {
+                display.innerText = "Lade Daten...";
             }
             
-            // Zwingt den Browser bei JEDER Anfrage, frische Daten von Google zu holen (kein Caching!)
-            const urlWithCacheBuster = SCRIPT_URL + "?nocache=" + new Date().getTime();
-
-            fetch(urlWithCacheBuster)
+            fetch(SCRIPT_URL)
                 .then(response => response.json())
                 .then(data => {
                     fetchedEvents = data || [];
@@ -578,9 +577,8 @@
                 })
                 .catch(error => {
                     console.error("Fehler beim Abrufen:", error);
-                    if (fetchedEvents.length === 0) {
-                        document.getElementById("monthYearDisplay").innerText = "Ladefehler!";
-                    }
+                    display.innerText = "Ladefehler!";
+                    setTimeout(() => renderCalendar(), 2000);
                 });
         }
 
