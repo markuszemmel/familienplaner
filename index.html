@@ -45,10 +45,10 @@
     .actions-bar {
       display: flex;
       justify-content: center;
-      gap: 10px;
+      gap: 8px;
       margin-top: 5px;
     }
-    .actions-bar a, .actions-bar button {
+    .actions-bar button {
       background-color: white;
       color: var(--primary-color);
       border: none;
@@ -56,7 +56,6 @@
       font-size: 13px;
       font-weight: bold;
       border-radius: 4px;
-      text-decoration: none;
       cursor: pointer;
     }
     table {
@@ -70,6 +69,7 @@
       padding: 6px 4px;
       text-align: center;
       font-size: 13px;
+      vertical-align: top;
     }
     th {
       background-color: var(--primary-color);
@@ -79,19 +79,15 @@
       font-weight: bold;
       width: 15%;
       background-color: #fafafa;
+      vertical-align: middle;
     }
     .appointment {
       font-size: 11px;
-      margin-bottom: 2px;
+      margin-bottom: 3px;
       padding: 3px 5px;
       background: #e2f0d9;
       border-radius: 3px;
       text-align: left;
-    }
-    .appointment-all {
-      background: #e8f4f8;
-      border-left: 3px solid #2980b9;
-      font-weight: bold;
     }
     .fab {
       position: fixed;
@@ -121,7 +117,7 @@
       <button onclick="changeMonth(1)">Vor &gt;</button>
     </div>
     <div class="actions-bar">
-      <a href="https://calendar.google.com/calendar/u/0/r/day" target="_blank">🔔 Tagesansicht</a>
+      <button onclick="goToNextEvents()">📅 Nächste</button>
       <button onclick="goToToday()">📍 Heute</button>
       <button onclick="openBirthdays()">🎂 Geburtstage</button>
     </div>
@@ -154,7 +150,7 @@
 
     async function fetchEvents() {
       try {
-        let response = await fetch(SCRIPT_URL + "?nocache=" + new Date().getTime());
+        let response = await fetch(SCRIPT_URL);
         cachedEvents = await response.json();
         renderCalendar();
       } catch (error) {
@@ -196,13 +192,26 @@
           return evDate.getDate() === day && evDate.getMonth() === month && evDate.getFullYear() === year;
         });
 
-        let mamaEvents = dayEvents.filter(e => e.color === "4" || e.color === "9");
-        let jonathanEvents = dayEvents.filter(e => e.color === "2" || e.color === "5");
-        let claraEvents = dayEvents.filter(e => e.color === "3" || e.color === "1");
-        let papaEvents = dayEvents.filter(e => e.color === "7" || e.color === "6");
-        
-        let allEvents = dayEvents.filter(e => !e.color || e.color === "" || 
-          !(e.color === "4" || e.color === "9" || e.color === "2" || e.color === "5" || e.color === "3" || e.color === "1" || e.color === "7" || e.color === "6"));
+        let mamaEvents = [];
+        let jonathanEvents = [];
+        let claraEvents = [];
+        let papaEvents = [];
+
+        dayEvents.forEach(e => {
+          let t = e.title.toLowerCase();
+          if (t.includes("mama")) {
+            mamaEvents.push(e);
+          } else if (t.includes("jonathan")) {
+            jonathanEvents.push(e);
+          } else if (t.includes("clara")) {
+            claraEvents.push(e);
+          } else if (t.includes("papa")) {
+            papaEvents.push(e);
+          } else {
+            // Allgemeine Termine standardmäßig in Papa oder Mama einsortieren (oder hier anpassen)
+            papaEvents.push(e);
+          }
+        });
 
         let personCols = [mamaEvents, jonathanEvents, claraEvents, papaEvents];
 
@@ -210,15 +219,10 @@
           let tdCol = document.createElement("td");
           let evs = personCols[i];
           
-          let html = evs.map(e => `<div class="appointment">${e.title}</div>`).join("");
-          
-          if (evs.length === 0 && i === 0 && allEvents.length > 0) {
-            html = allEvents.map(e => `<div class="appointment appointment-all">📌 ${e.title}</div>`).join("");
-          } else if (allEvents.length > 0 && i === 0) {
-            html += allEvents.map(e => `<div class="appointment appointment-all">📌 ${e.title}</div>`).join("");
+          if (evs.length > 0) {
+            tdCol.innerHTML = evs.map(e => `<div class="appointment">${e.title}</div>`).join("");
           }
 
-          tdCol.innerHTML = html;
           row.appendChild(tdCol);
         }
 
@@ -236,13 +240,13 @@
       renderCalendar();
     }
 
+    function goToNextEvents() {
+      alert("Nächste Termine Ansicht.");
+    }
+
     function openBirthdays() {
       alert("Geburtstags-Ansicht folgt.");
     }
-
-    window.addEventListener('pageshow', function(event) {
-      fetchEvents();
-    });
 
     fetchEvents();
   </script>
