@@ -33,7 +33,7 @@
       align-items: center;
       margin-bottom: 8px;
     }
-    .nav-bar button, .nav-bar a {
+    .nav-bar button {
       background-color: white;
       color: var(--primary-color);
       border: none;
@@ -41,7 +41,6 @@
       font-weight: bold;
       border-radius: 4px;
       cursor: pointer;
-      text-decoration: none;
     }
     .actions-bar {
       display: flex;
@@ -81,7 +80,19 @@
       width: 15%;
       background-color: #fafafa;
     }
-    /* Floating Action Button für neue Termine */
+    .appointment {
+      font-size: 11px;
+      margin-bottom: 2px;
+      padding: 3px 5px;
+      background: #e2f0d9;
+      border-radius: 3px;
+      text-align: left;
+    }
+    .appointment-all {
+      background: #e8f4f8;
+      border-left: 3px solid #2980b9;
+      font-weight: bold;
+    }
     .fab {
       position: fixed;
       bottom: 20px;
@@ -133,7 +144,6 @@
     </table>
   </div>
 
-  <!-- Schwebender + Button verlinkt direkt auf die Google Kalender App Erstellen-Ansicht -->
   <a href="https://calendar.google.com/calendar/u/0/r/eventedit" target="_blank" class="fab">+</a>
 
   <script>
@@ -144,7 +154,6 @@
 
     async function fetchEvents() {
       try {
-        // Cache mit einem Zeitstempel umgehen, damit Google immer die frischen Daten liefert
         let response = await fetch(SCRIPT_URL + "?nocache=" + new Date().getTime());
         cachedEvents = await response.json();
         renderCalendar();
@@ -176,29 +185,40 @@
         tdDay.className = "day-cell";
         tdDay.innerHTML = `${dayOfWeek}<br><strong>${day}</strong>`;
         
-        // Aktuellen Tag hervorheben
         let today = new Date();
         if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
           tdDay.style.backgroundColor = "#ffeeba";
         }
         row.appendChild(tdDay);
 
-        // 4 Spalten für: Mama, Jonathan, Clara, Papa
+        let dayEvents = cachedEvents.filter(ev => {
+          let evDate = new Date(ev.start);
+          return evDate.getDate() === day && evDate.getMonth() === month && evDate.getFullYear() === year;
+        });
+
+        let mamaEvents = dayEvents.filter(e => e.color === "4" || e.color === "9");
+        let jonathanEvents = dayEvents.filter(e => e.color === "2" || e.color === "5");
+        let claraEvents = dayEvents.filter(e => e.color === "3" || e.color === "1");
+        let papaEvents = dayEvents.filter(e => e.color === "7" || e.color === "6");
+        
+        let allEvents = dayEvents.filter(e => !e.color || e.color === "" || 
+          !(e.color === "4" || e.color === "9" || e.color === "2" || e.color === "5" || e.color === "3" || e.color === "1" || e.color === "7" || e.color === "6"));
+
+        let personCols = [mamaEvents, jonathanEvents, claraEvents, papaEvents];
+
         for (let i = 0; i < 4; i++) {
           let tdCol = document.createElement("td");
+          let evs = personCols[i];
           
-          // Passende Termine für diesen Tag filtern
-          let dayEvents = cachedEvents.filter(ev => {
-            let evDate = new Date(ev.start);
-            return evDate.getDate() === day && evDate.getMonth() === month && evDate.getFullYear() === year;
-          });
-
-          // Hier greift nun unser sicherer Fallback: 
-          // Jedes Event landet zuverlässig im Planer, ohne dass farblose Standard-Termine verschluckt werden.
-          if (dayEvents.length > 0) {
-            tdCol.innerHTML = dayEvents.map(e => `<div style="font-size:11px; margin-bottom:2px; padding:2px; background:#e2f0d9; border-radius:3px;">${e.title}</div>`).join("");
+          let html = evs.map(e => `<div class="appointment">${e.title}</div>`).join("");
+          
+          if (evs.length === 0 && i === 0 && allEvents.length > 0) {
+            html = allEvents.map(e => `<div class="appointment appointment-all">📌 ${e.title}</div>`).join("");
+          } else if (allEvents.length > 0 && i === 0) {
+            html += allEvents.map(e => `<div class="appointment appointment-all">📌 ${e.title}</div>`).join("");
           }
 
+          tdCol.innerHTML = html;
           row.appendChild(tdCol);
         }
 
@@ -220,12 +240,10 @@
       alert("Geburtstags-Ansicht folgt.");
     }
 
-    // Automatischer Frische-Abruf, wenn man per Zurück-Taste aus der Google Kalender App zurückkehrt
     window.addEventListener('pageshow', function(event) {
       fetchEvents();
     });
 
-    // Erster Start beim Laden der Seite
     fetchEvents();
   </script>
 
