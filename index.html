@@ -175,6 +175,7 @@
             background-color: #d2e4d9;
         }
 
+        /* Dezent farblich hinterlegte Feiertags-/Ferien-Zeilen */
         tr.holiday-row td {
             background-color: #f0f6ff !important; 
         }
@@ -226,8 +227,9 @@
             background: #e0eeff;
         }
 
+        /* Dezenter Text für Feiertage / Ferien in Spalte 1 (ohne Symbole) */
         .holiday-label {
-            font-size: 0.55rem;
+            font-size: 0.52rem;
             color: #1c5295;
             margin-top: 2px;
             line-height: 1.1;
@@ -674,10 +676,10 @@
                         const titleText = event.title || "Termin";
                         const titleLower = titleText.toLowerCase();
                         
-                        // Erkennung von Feiertagen oder Schulferien anhand des Titels oder Typs
-                        if (event.type === "holiday" || event.type === "ferien" || titleLower.includes("ferien") || titleLower.includes("feiertag") || titleLower.includes("tag der arbeit") || titleLower.includes("weihnachten") || titleLower.includes("ostern") || titleLower.includes("pfingsten") || titleLower.includes("reformationstag") || titleLower.includes("allerheiligen") || titleLower.includes("neumajahr") || titleLower.includes("christi himmelfahrt") || titleLower.includes("fronleichnam") || titleLower.includes("tag der deutschen einheit")) {
+                        // Erkennung von Feiertagen oder Schulferien zur Zeilen-Einfärbung und Anzeige in Spalte 1 (ohne Symbole)
+                        if (event.type === "holiday" || event.type === "ferien" || titleLower.includes("ferien") || titleLower.includes("feiertag") || titleLower.includes("tag der arbeit") || titleLower.includes("weihnachten") || titleLower.includes("ostern") || titleLower.includes("pfingsten") || titleLower.includes("reformationstag") || titleLower.includes("allerheiligen") || titleLower.includes("neujahr") || titleLower.includes("christi himmelfahrt") || titleLower.includes("fronleichnam") || titleLower.includes("tag der deutschen einheit")) {
                             isHoliday = true;
-                            dayLabels += `<div class="holiday-label">🏖️ ${titleText}</div>`;
+                            dayLabels += `<div class="holiday-label">${titleText}</div>`;
                         } 
                         else {
                             let timeHtml = "";
