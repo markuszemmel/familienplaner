@@ -227,7 +227,6 @@
             background: #e0eeff;
         }
 
-        /* Feiertags-/Ferien-Text in Spalte 1 (dezent flieder/violett, ohne BW) */
         .holiday-label {
             font-size: 0.52rem;
             color: #725282;
@@ -237,7 +236,6 @@
             word-break: break-word;
         }
 
-        /* Anklickbarer Termin-Kasten */
         .appointment {
             display: block;
             background: #f9fbf9;
@@ -262,7 +260,6 @@
         .appointment.geburtstag { border-left-color: var(--color-geburtstag); background: #fffde7; }
         .appointment.geburtstag:hover { background: #fcf8cc; }
 
-        /* Gemeinschaftstermine (Alle) ohne Symbole */
         .appointment-all {
             display: block;
             background: #fef3e6;
@@ -302,7 +299,6 @@
             background-color: transparent; 
         }
 
-        /* Schwebender + Button unten rechts */
         .fab-btn {
             position: fixed;
             bottom: 20px;
@@ -330,7 +326,6 @@
             transform: scale(1.08);
         }
 
-        /* Schwebender Aktualisieren-Button im selben Look */
         .refresh-fab-btn {
             position: fixed;
             bottom: 78px;
@@ -357,7 +352,6 @@
             transform: scale(1.08);
         }
 
-        /* Modal / Pop-Up Styles */
         .modal {
             display: none;
             position: fixed;
@@ -453,13 +447,9 @@
         </div>
     </div>
 
-    <!-- Schwebender Aktualisieren-Button -->
     <div class="refresh-fab-btn" onclick="manualRefresh()" title="Kalender aktualisieren">↻</div>
-
-    <!-- Schwebender + Button -->
     <a href="https://calendar.google.com/calendar/render?action=TEMPLATE" target="_blank" class="fab-btn" title="Neuen Termin erstellen">+</a>
 
-    <!-- Wetter-Pop-Up -->
     <div id="weatherModal" class="modal" onclick="closeModal('weatherModal')">
         <div class="modal-content" onclick="event.stopPropagation()">
             <h3 id="modalDateTitle">Wetter-Vorschau</h3>
@@ -468,7 +458,6 @@
         </div>
     </div>
 
-    <!-- Geburtstags-Übersicht Pop-Up -->
     <div id="bdayModal" class="modal" onclick="closeModal('bdayModal')">
         <div class="modal-content" onclick="event.stopPropagation()">
             <h3>🎂 Geburtstage (nächste 4 Wochen)</h3>
@@ -477,7 +466,6 @@
         </div>
     </div>
 
-    <!-- Nächste Termine Pop-Up -->
     <div id="eventsModal" class="modal" onclick="closeModal('eventsModal')">
         <div class="modal-content" onclick="event.stopPropagation()">
             <h3>📅 Termine nächste 10 Tage</h3>
@@ -627,6 +615,30 @@
             return `https://calendar.google.com/calendar/r/day/${yyyy}/${mm}/${dd}`;
         }
 
+        // Hilfsfunktion zum Erkennen von Multi-Personen-Kürzeln (z.B. mj, cp, pcj)
+        function parseMultiPerson(title) {
+            let words = title.split(/\s+/);
+            let persons = [];
+            let cleanWords = [];
+            
+            for (let w of words) {
+                let cleanW = w.replace(/[\[\]\(\)]/g, '');
+                if (/^[mjcp]{2,}$/i.test(cleanW)) {
+                    let chars = cleanW.toLowerCase();
+                    if (chars.includes('m')) persons.push('mama');
+                    if (chars.includes('j')) persons.push('jonathan');
+                    if (chars.includes('c')) persons.push('clara');
+                    if (chars.includes('p')) persons.push('papa');
+                } else {
+                    cleanWords.push(w);
+                }
+            }
+            return {
+                cleanTitle: cleanWords.join(' ').trim(),
+                persons: [...new Set(persons)]
+            };
+        }
+
         function renderCalendar() {
             document.getElementById("monthYearDisplay").innerText = monthsNames[currentMonth] + " " + currentYear;
             const tbody = document.getElementById("calendarBody");
@@ -710,7 +722,6 @@
 
                         if (isSystemHoliday) {
                             isHoliday = true;
-                            // "Baden-Württemberg" und Regionen-Zusätze sauber herausfiltern
                             let cleanTitle = titleText
                                 .replace(/Baden-Württemberg/gi, '')
                                 .replace(/[-–]\s*BW\b/gi, '')
@@ -727,25 +738,36 @@
                             }
 
                             const dayLink = getCalendarDayLink(event.start);
-                            const titleContent = timeHtml + titleText;
                             
-                            if (colorId === "1" || colorId === "#7986cb" || colorId === "#a4bdfc") { 
-                                mamaHtml += `<a href="${dayLink}" target="_blank" class="appointment mama" title="Im Google Kalender öffnen">${titleContent}</a>`; 
+                            // Auf Multi-Personen-Kürzel prüfen (z.B. mj, cp, pcj im Titel)
+                            const parsed = parseMultiPerson(titleText);
+                            const finalTitleContent = timeHtml + (parsed.cleanTitle || titleText);
+
+                            if (parsed.persons.length > 0) {
+                                // Termin in allen erkannten Spalten als Gemeinschafts-Termin (Standard-Orange) anzeigen
+                                const multiHtml = `<a href="${dayLink}" target="_blank" class="appointment-all" title="Im Google Kalender öffnen">${finalTitleContent}</a>`;
+                                if (parsed.persons.includes('mama')) mamaHtml += multiHtml;
+                                if (parsed.persons.includes('jonathan')) jonathanHtml += multiHtml;
+                                if (parsed.persons.includes('clara')) claraHtml += multiHtml;
+                                if (parsed.persons.includes('papa')) papaHtml += multiHtml;
+                            }
+                            else if (colorId === "1" || colorId === "#7986cb" || colorId === "#a4bdfc") { 
+                                mamaHtml += `<a href="${dayLink}" target="_blank" class="appointment mama" title="Im Google Kalender öffnen">${finalTitleContent}</a>`; 
                             } 
                             else if (colorId === "3" || colorId === "#8e24aa" || colorId === "#dbadff") { 
-                                jonathanHtml += `<a href="${dayLink}" target="_blank" class="appointment jonathan" title="Im Google Kalender öffnen">${titleContent}</a>`; 
+                                jonathanHtml += `<a href="${dayLink}" target="_blank" class="appointment jonathan" title="Im Google Kalender öffnen">${finalTitleContent}</a>`; 
                             } 
                             else if (colorId === "4" || colorId === "#e67c73" || colorId === "#ff887c") { 
-                                claraHtml += `<a href="${dayLink}" target="_blank" class="appointment clara" title="Im Google Kalender öffnen">${titleContent}</a>`; 
+                                claraHtml += `<a href="${dayLink}" target="_blank" class="appointment clara" title="Im Google Kalender öffnen">${finalTitleContent}</a>`; 
                             } 
                             else if (colorId === "5" || colorId === "#f6bf26" || colorId === "#fbd75b") { 
-                                geburtstagHtml += `<a href="${dayLink}" target="_blank" class="appointment geburtstag" title="Im Google Kalender öffnen">🎂 ${titleContent}</a>`; 
+                                geburtstagHtml += `<a href="${dayLink}" target="_blank" class="appointment geburtstag" title="Im Google Kalender öffnen">🎂 ${finalTitleContent}</a>`; 
                             } 
                             else if (colorId === "8" || colorId === "#616161" || colorId === "#e1e1e1") { 
-                                papaHtml += `<a href="${dayLink}" target="_blank" class="appointment papa" title="Im Google Kalender öffnen">${titleContent}</a>`; 
+                                papaHtml += `<a href="${dayLink}" target="_blank" class="appointment papa" title="Im Google Kalender öffnen">${finalTitleContent}</a>`; 
                             } 
                             else {
-                                allHtml += `<a href="${dayLink}" target="_blank" class="appointment-all" title="Im Google Kalender öffnen">${titleContent}</a>`; 
+                                allHtml += `<a href="${dayLink}" target="_blank" class="appointment-all" title="Im Google Kalender öffnen">${finalTitleContent}</a>`; 
                             }
                         }
                     }
