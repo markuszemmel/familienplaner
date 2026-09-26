@@ -588,8 +588,10 @@
             }
             
             fetch(SCRIPT_URL + "?nocache=" + new Date().getTime())
-                .then(response => response.json())
-                .then(data => {
+                .then(response => response.text())
+                .then(text => {
+                    let cleanText = text.replace(/<[^>]*>?/gm, '');
+                    const data = JSON.parse(cleanText);
                     fetchedEvents = data || [];
                     localStorage.setItem("family_calendar_cache", JSON.stringify(fetchedEvents));
                     renderCalendar();
