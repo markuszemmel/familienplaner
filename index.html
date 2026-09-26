@@ -323,7 +323,7 @@
             transform: scale(1.08);
         }
 
-        /* Schwebender Aktualisieren-Button */
+        /* Schwebender Aktualisieren-Button im selben Look */
         .refresh-fab-btn {
             position: fixed;
             bottom: 78px;
@@ -489,24 +489,14 @@
         const daysNames = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
 
         const todayObj = new Date();
-        let currentYear, currentMonth;
-
-        // Gespeicherten Monat auslesen, falls vorhanden (damit Pull-to-Refresh den Monat behält)
-        const savedMonth = sessionStorage.getItem("cal_month");
-        const savedYear = sessionStorage.getItem("cal_year");
-
-        if (savedMonth !== null && savedYear !== null) {
-            currentMonth = parseInt(savedMonth);
-            currentYear = parseInt(savedYear);
-        } else {
-            currentMonth = todayObj.getMonth();
-            currentYear = todayObj.getFullYear();
-        }
-
+        let currentYear = todayObj.getFullYear();
+        let currentMonth = todayObj.getMonth();
         let fetchedEvents = [];
         let weatherData = {};
 
         window.onload = function() {
+            goToToday();
+            
             const cachedData = localStorage.getItem("family_calendar_cache");
             if (cachedData) {
                 try {
@@ -518,11 +508,6 @@
             fetchWeather();
             fetchCalendarEvents();
         };
-
-        function saveCurrentPosition() {
-            sessionStorage.setItem("cal_month", currentMonth);
-            sessionStorage.setItem("cal_year", currentYear);
-        }
 
         function fetchWeather() {
             const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max,windspeed_10m_max&timezone=Europe%2FBerlin`;
@@ -634,7 +619,6 @@
         }
 
         function renderCalendar() {
-            saveCurrentPosition(); // Aktuellen Monat immer speichern
             document.getElementById("monthYearDisplay").innerText = monthsNames[currentMonth] + " " + currentYear;
             const tbody = document.getElementById("calendarBody");
             tbody.innerHTML = "";
@@ -772,57 +756,26 @@
                     tbody.appendChild(row);
                 }
             }
+
+            setTimeout(() => {
+                const container = document.getElementById("tableContainer");
+                const isThisMonth = (currentMonth === todayObj.getMonth() && currentYear === todayObj.getFullYear());
+                const todayElem = document.getElementById("todayElement");
+
+                if (isThisMonth && todayElem) {
+                    todayElem.scrollIntoView({ behavior: "smooth", block: "center" });
+                } else if (container) {
+                    container.scrollTop = 0;
+                }
+            }, 300);
         }
 
         function goToToday() {
             currentYear = todayObj.getFullYear();
             currentMonth = todayObj.getMonth();
-            saveCurrentPosition();
             renderCalendar();
-            
-            // Zum HEUTIGEN Tag scrollen
-            setTimeout(() => {
-                const todayElem = document.getElementById("todayElement");
-                if (todayElem) {
-                    todayElem.scrollIntoView({ behavior: "smooth", block: "center" });
-                }
-            }, 200);
         }
 
-        function checkUpcomingBirthdays() {
-            const now = new Date();
-            const in28Days = new Date();
-            in28Days.setDate(now.getDate() + 28);
-
-            let upcoming = [];
-
-            fetchedEvents.forEach(e => {
-                if (e.color === "5" || e.color === "#f6bf26" || e.color === "#fbd75b") {
-                    const evDate = new Date(e.start);
-                    if (evDate >= now && evDate <= in28Days) {
-                        const dayStr = evDate.getDate().toString().padStart(2, '0');
-                        const monthStr = (evDate.getMonth() + 1).toString().padStart(2, '0');
-                        upcoming.push({ name: e.title, date: `${dayStr}.${monthStr}.`, fullDate: evDate });
-                    }
-                }
-            });
-
-            upcoming.sort((a, b) => a.fullDate - b.fullDate);
-
-            const listContainer = document.getElementById("bdayList");
-            if (upcoming.length === 0) {
-                listContainer.innerHTML = `<div style="font-size:0.85rem; color:#666; padding:10px;">In den nächsten 4 Wochen stehen keine Geburtstage an.</div>`;
-            } else {
-                let html = "";
-                upcoming.getItem = upcoming.forEach(item => {
-                    html += `<div class="modal-item">🎂 <strong>${item.date}</strong> - ${item.name}</div>`;
-                });
-                listContainer.innerHTML = html;
-            }
-            document.getElementById("bdayModal").style.display = "flex";
-        }
-
-        // Korrektur für die Geburtstags-Schleife oben
         function checkUpcomingBirthdays() {
             const now = new Date();
             const in28Days = new Date();
@@ -927,7 +880,6 @@
             currentMonth += direction;
             if (currentMonth > 11) { currentMonth = 0; currentYear++; }
             else if (currentMonth < 0) { currentMonth = 11; currentYear--; }
-            saveCurrentPosition();
             renderCalendar(); 
         }
 
