@@ -295,7 +295,7 @@
             background-color: transparent; 
         }
 
-        /* Schwebender Button unten rechts */
+        /* Schwebender + Button unten rechts */
         .fab-btn {
             position: fixed;
             bottom: 20px;
@@ -314,11 +314,37 @@
             cursor: pointer;
             text-decoration: none;
             z-index: 99;
-            opacity: 0.8;
+            opacity: 0.85;
             transition: opacity 0.2s, transform 0.2s;
             border: 2px solid white;
         }
         .fab-btn:hover, .fab-btn:active {
+            opacity: 1.0;
+            transform: scale(1.08);
+        }
+
+        /* Schwebender Aktualisieren-Button über dem + Button */
+        .refresh-fab-btn {
+            position: fixed;
+            bottom: 78px;
+            right: 20px;
+            width: 38px;
+            height: 38px;
+            background-color: #27ae60;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+            cursor: pointer;
+            border: 2px solid white;
+            z-index: 99;
+            opacity: 0.85;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        .refresh-fab-btn:hover, .refresh-fab-btn:active {
             opacity: 1.0;
             transform: scale(1.08);
         }
@@ -380,6 +406,7 @@
             thead th { font-size: 0.7rem; padding: 6px 1px; }
             .col-tag { width: 44px; }
             .fab-btn { bottom: 15px; right: 15px; width: 44px; height: 44px; font-size: 1.6rem; }
+            .refresh-fab-btn { bottom: 67px; right: 15px; width: 34px; height: 34px; font-size: 1rem; }
         }
     </style>
 </head>
@@ -394,7 +421,7 @@
                 <button class="nav-btn" onclick="changeMonth(1)">Vor ▶</button>
             </div>
             <div class="action-buttons-row">
-                <button class="action-btn-green" onclick="checkUpcomingEvents()">📅 Nächste</button>
+                <button class="action-btn-green" onclick="checkUpcomingEvents()">📅 Nächste Termine</button>
                 <button class="today-btn-orange" onclick="goToToday()">📍 Heute</button>
                 <button class="action-btn-green" onclick="checkUpcomingBirthdays()">🎂 Geburtstage</button>
             </div>
@@ -417,6 +444,9 @@
             </table>
         </div>
     </div>
+
+    <!-- Schwebender Aktualisieren-Button über dem + Button -->
+    <div class="refresh-fab-btn" onclick="manualRefresh()" title="Kalender aktualisieren">↻</div>
 
     <!-- Schwebender + Button -->
     <a href="https://calendar.google.com/calendar/render?action=TEMPLATE" target="_blank" class="fab-btn" title="Neuen Termin erstellen">+</a>
@@ -464,6 +494,9 @@
         let weatherData = {};
 
         window.onload = function() {
+            // Beim Start immer zum heutigen Tag / Monat springen
+            goToToday();
+            
             const cachedData = localStorage.getItem("family_calendar_cache");
             if (cachedData) {
                 try {
@@ -473,7 +506,7 @@
             }
             
             fetchWeather();
-            fetchCalendarEvents();
+            fetchCalendarEvents(false);
         };
 
         function fetchWeather() {
@@ -547,26 +580,35 @@
             document.getElementById(modalId).style.display = "none";
         }
 
-        function fetchCalendarEvents() {
+        function fetchCalendarEvents(resetToToday = false) {
             const display = document.getElementById("monthYearDisplay");
             
             if (fetchedEvents.length === 0) {
                 display.innerText = "Lade Daten...";
             }
             
-            // Mit Zeitstempel (?nocache=...) damit der Browser keine alten Daten aus dem Cache zieht
             fetch(SCRIPT_URL + "?nocache=" + new Date().getTime())
                 .then(response => response.json())
                 .then(data => {
                     fetchedEvents = data || [];
                     localStorage.setItem("family_calendar_cache", JSON.stringify(fetchedEvents));
-                    renderCalendar();
+                    
+                    if (resetToToday) {
+                        goToToday();
+                    } else {
+                        renderCalendar();
+                    }
                 })
                 .catch(error => {
                     console.error("Fehler beim Abrufen:", error);
                     display.innerText = "Ladefehler!";
                     setTimeout(() => renderCalendar(), 2000);
                 });
+        }
+
+        function manualRefresh() {
+            // Nur Daten holen, aktueller Monat bleibt stur erhalten
+            fetchCalendarEvents(false);
         }
 
         function getCalendarDayLink(startDate) {
@@ -843,9 +885,9 @@
             renderCalendar(); 
         }
 
-        // Automatischer Frische-Abruf beim Zurückkehren aus der App
+        // Beim Zurückkehren aus der App holen wir die Daten frisch, behalten aber den Monat bei
         window.addEventListener('pageshow', function(event) {
-            fetchCalendarEvents();
+            fetchCalendarEvents(false);
         });
     </script>
 
