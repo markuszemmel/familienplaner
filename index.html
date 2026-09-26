@@ -45,10 +45,12 @@
     .actions-bar {
       display: flex;
       justify-content: center;
-      gap: 6px;
+      gap: 8px;
       margin-top: 5px;
     }
     .actions-bar button {
+      background-color: white;
+      color: var(--primary-color);
       border: none;
       padding: 6px 10px;
       font-size: 13px;
@@ -56,10 +58,6 @@
       border-radius: 4px;
       cursor: pointer;
     }
-    .btn-next { background-color: #27ae60; color: white; }
-    .btn-today { background-color: #e67e22; color: white; }
-    .btn-birthday { background-color: #27ae60; color: white; }
-
     table {
       width: 100%;
       border-collapse: collapse;
@@ -125,9 +123,9 @@
       <button onclick="changeMonth(1)">Vor &gt;</button>
     </div>
     <div class="actions-bar">
-      <button class="btn-next" onclick="showNextEvents()">📅 Nächste</button>
-      <button class="btn-today" onclick="goToToday()">📍 Heute</button>
-      <button class="btn-birthday" onclick="showBirthdays()">🎂 Geburtstage</button>
+      <button onclick="showNextEvents()">📅 Nächste</button>
+      <button onclick="goToToday()">📍 Heute</button>
+      <button onclick="showBirthdays()">🎂 Geburtstage</button>
     </div>
   </header>
 
@@ -159,7 +157,7 @@
 
     async function fetchEvents() {
       try {
-        let response = await fetch(SCRIPT_URL);
+        let response = await fetch(SCRIPT_URL + "?nocache=" + new Date().getTime());
         cachedEvents = await response.json();
         await fetchWeather();
         renderCalendar();
@@ -168,7 +166,6 @@
       }
     }
 
-    // Wetter für Wolfschlugen über kostenlose Open-Meteo API laden
     async function fetchWeather() {
       try {
         let res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=48.65&longitude=9.32&daily=weathercode,temperature_2m_max&timezone=Europe%2FBerlin");
@@ -295,6 +292,10 @@
       let bdays = cachedEvents.filter(e => e.title.toLowerCase().includes("geburtstag"));
       alert("Geburtstage (nächste Wochen/Monate):\n\n" + (bdays.length > 0 ? bdays.map(e => e.title).join("\n") : "Keine Geburtstage gefunden."));
     }
+
+    window.addEventListener('pageshow', function(event) {
+      fetchEvents();
+    });
 
     fetchEvents();
   </script>
