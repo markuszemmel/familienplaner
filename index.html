@@ -554,7 +554,8 @@
                 display.innerText = "Lade Daten...";
             }
             
-            fetch(SCRIPT_URL)
+            // Mit Zeitstempel (?nocache=...) damit der Browser keine alten Daten aus dem Cache zieht
+            fetch(SCRIPT_URL + "?nocache=" + new Date().getTime())
                 .then(response => response.json())
                 .then(data => {
                     fetchedEvents = data || [];
@@ -841,6 +842,11 @@
             else if (currentMonth < 0) { currentMonth = 11; currentYear--; }
             renderCalendar(); 
         }
+
+        // Automatischer Frische-Abruf beim Zurückkehren aus der App
+        window.addEventListener('pageshow', function(event) {
+            fetchCalendarEvents();
+        });
     </script>
 
 </body>
