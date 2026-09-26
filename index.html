@@ -235,7 +235,7 @@
             word-break: break-word;
         }
 
-        /* Anklickbarer Termin-Kasten (ersetzt die Glocken) */
+        /* Anklickbarer Termin-Kasten */
         .appointment {
             display: block;
             background: #f9fbf9;
@@ -672,8 +672,10 @@
 
                     if (evStart <= dayEnd && evEnd > dayStart) {
                         const titleText = event.title || "Termin";
+                        const titleLower = titleText.toLowerCase();
                         
-                        if (event.type === "holiday" || event.type === "ferien") {
+                        // Erkennung von Feiertagen oder Schulferien anhand des Titels oder Typs
+                        if (event.type === "holiday" || event.type === "ferien" || titleLower.includes("ferien") || titleLower.includes("feiertag") || titleLower.includes("tag der arbeit") || titleLower.includes("weihnachten") || titleLower.includes("ostern") || titleLower.includes("pfingsten") || titleLower.includes("reformationstag") || titleLower.includes("allerheiligen") || titleLower.includes("neumajahr") || titleLower.includes("christi himmelfahrt") || titleLower.includes("fronleichnam") || titleLower.includes("tag der deutschen einheit")) {
                             isHoliday = true;
                             dayLabels += `<div class="holiday-label">🏖️ ${titleText}</div>`;
                         } 
@@ -834,7 +836,11 @@
                 let dayItems = [];
 
                 fetchedEvents.forEach(e => {
-                    if (e.type !== "holiday" && e.type !== "ferien" && e.color !== "5" && e.color !== "#f6bf26" && e.color !== "#fbd75b") {
+                    const tLow = (e.title || "").toLowerCase();
+                    const isHolidayOrFerien = e.type === "holiday" || e.type === "ferien" || tLow.includes("ferien") || tLow.includes("feiertag");
+                    const isBday = e.color === "5" || e.color === "#f6bf26" || e.color === "#fbd75b";
+
+                    if (!isHolidayOrFerien && !isBday) {
                         const evStart = new Date(e.start);
                         const evEnd = new Date(e.end);
 
@@ -878,10 +884,6 @@
                 listContainer.innerHTML = html;
             }
             document.getElementById("eventsModal").style.display = "flex";
-        }
-
-        function changeMonth(description) {
-            // (Funktion unverändert)
         }
 
         function changeMonth(direction) {
