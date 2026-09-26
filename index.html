@@ -615,7 +615,6 @@
             return `https://calendar.google.com/calendar/r/day/${yyyy}/${mm}/${dd}`;
         }
 
-        // Hilfsfunktion zum Erkennen von Multi-Personen-Kürzeln (z.B. mj, cp, pcj)
         function parseMultiPerson(title) {
             let words = title.split(/\s+/);
             let persons = [];
@@ -625,10 +624,10 @@
                 let cleanW = w.replace(/[\[\]\(\)]/g, '');
                 if (/^[mjcp]{2,}$/i.test(cleanW)) {
                     let chars = cleanW.toLowerCase();
-                    if (chars.includes('m')) persons.push('mama');
-                    if (chars.includes('j')) persons.push('jonathan');
-                    if (chars.includes('c')) persons.push('clara');
-                    if (chars.includes('p')) persons.push('papa');
+                    if (chars.includes('m')) persons.push('Mama');
+                    if (chars.includes('j')) persons.push('Jonathan');
+                    if (chars.includes('c')) persons.push('Clara');
+                    if (chars.includes('p')) persons.push('Papa');
                 } else {
                     cleanWords.push(w);
                 }
@@ -738,18 +737,15 @@
                             }
 
                             const dayLink = getCalendarDayLink(event.start);
-                            
-                            // Auf Multi-Personen-Kürzel prüfen (z.B. mj, cp, pcj im Titel)
                             const parsed = parseMultiPerson(titleText);
                             const finalTitleContent = timeHtml + (parsed.cleanTitle || titleText);
 
                             if (parsed.persons.length > 0) {
-                                // Termin in allen erkannten Spalten als Gemeinschafts-Termin (Standard-Orange) anzeigen
                                 const multiHtml = `<a href="${dayLink}" target="_blank" class="appointment-all" title="Im Google Kalender öffnen">${finalTitleContent}</a>`;
-                                if (parsed.persons.includes('mama')) mamaHtml += multiHtml;
-                                if (parsed.persons.includes('jonathan')) jonathanHtml += multiHtml;
-                                if (parsed.persons.includes('clara')) claraHtml += multiHtml;
-                                if (parsed.persons.includes('papa')) papaHtml += multiHtml;
+                                if (parsed.persons.includes('Mama')) mamaHtml += multiHtml;
+                                if (parsed.persons.includes('Jonathan')) jonathanHtml += multiHtml;
+                                if (parsed.persons.includes('Clara')) claraHtml += multiHtml;
+                                if (parsed.persons.includes('Papa')) papaHtml += multiHtml;
                             }
                             else if (colorId === "1" || colorId === "#7986cb" || colorId === "#a4bdfc") { 
                                 mamaHtml += `<a href="${dayLink}" target="_blank" class="appointment mama" title="Im Google Kalender öffnen">${finalTitleContent}</a>`; 
@@ -909,12 +905,18 @@
                         const evEnd = new Date(e.end);
 
                         if (evStart <= dayEnd && evEnd > dayStart) {
-                            let person = "Alle";
-                            const c = e.color;
-                            if (c === "1" || c === "#7986cb" || c === "#a4bdfc") person = "Mama";
-                            else if (c === "3" || c === "#8e24aa" || c === "#dbadff") person = "Jonathan";
-                            else if (c === "4" || c === "#e67c73" || c === "#ff887c") person = "Clara";
-                            else if (c === "8" || c === "#616161" || c === "#e1e1e1") person = "Papa";
+                            const parsed = parseMultiPerson(e.title || "Termin");
+                            let personStr = "Alle";
+
+                            if (parsed.persons.length > 0) {
+                                personStr = parsed.persons.join(" & ");
+                            } else {
+                                const c = e.color;
+                                if (c === "1" || c === "#7986cb" || c === "#a4bdfc") personStr = "Mama";
+                                else if (c === "3" || c === "#8e24aa" || c === "#dbadff") personStr = "Jonathan";
+                                else if (c === "4" || c === "#e67c73" || c === "#ff887c") personStr = "Clara";
+                                else if (c === "8" || c === "#616161" || c === "#e1e1e1") personStr = "Papa";
+                            }
 
                             let timeStr = "";
                             if (!e.allDay) {
@@ -923,7 +925,7 @@
                                 timeStr = ` (🕒 ${hh}:${mm})`;
                             }
 
-                            dayItems.push(`${e.title} (${person})${timeStr}`);
+                            dayItems.push(`${parsed.cleanTitle} (${personStr})${timeStr}`);
                         }
                     }
                 });
