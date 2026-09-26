@@ -175,12 +175,12 @@
             background-color: #d2e4d9;
         }
 
-        /* Dezente farbliche Hinterlegung für Feiertage/Ferien */
+        /* Dezente pastell-orange Hinterlegung für Feiertage und Schulferien */
         tr.holiday-row td {
-            background-color: #f0f6ff !important; 
+            background-color: #fef5e7 !important; 
         }
         tr.holiday-row .day-col {
-            background-color: #e0eeff !important;
+            background-color: #fdebd0 !important;
         }
 
         tr.today-row td {
@@ -227,10 +227,10 @@
             background: #e0eeff;
         }
 
-        /* Feiertage/Ferien Text in Spalte 1 */
+        /* Feiertags-/Ferien-Text in Spalte 1 (ohne Symbole) */
         .holiday-label {
             font-size: 0.52rem;
-            color: #1c5295;
+            color: #b9770e;
             margin-top: 2px;
             line-height: 1.1;
             font-weight: bold;
@@ -262,7 +262,7 @@
         .appointment.geburtstag { border-left-color: var(--color-geburtstag); background: #fffde7; }
         .appointment.geburtstag:hover { background: #fcf8cc; }
 
-        /* Gemeinschaftstermine (Alle) ohne Sonnen-Symbol */
+        /* Gemeinschaftstermine (Alle) ohne Sonnen- oder Stern-Symbol */
         .appointment-all {
             display: block;
             background: #fef3e6;
@@ -676,12 +676,43 @@
                     if (evStart <= dayEnd && evEnd > dayStart) {
                         const titleText = event.title || "Termin";
                         const titleLower = titleText.toLowerCase();
-                        
-                        // Erkennung von Feiertagen oder Schulferien für den Hintergrund & Spalte 1
-                        const isSystemHoliday = event.type === "holiday" || event.type === "ferien" || titleLower.includes("feiertag") || titleLower.includes("ferien") || titleLower.includes("tag der arbeit") || titleLower.includes("weihnachten") || titleLower.includes("ostern") || titleLower.includes("pfingsten") || titleLower.includes("reformationstag") || titleLower.includes("allerheiligen") || titleLower.includes("neujahr") || titleLower.includes("christi himmelfahrt") || titleLower.includes("fronleichnam") || titleLower.includes("tag der deutschen einheit");
+                        const colorId = event.color;
 
-                        if (isSystemHoliday && titleLower.length < 30) {
+                        // Prüfung, ob es ein persönlicher Termin mit Farbcode ist (z.B. Ferien J oder Ferien C)
+                        const isPersonalAppointment = (colorId === "1" || colorId === "#7986cb" || colorId === "#a4bdfc" ||
+                                                       colorId === "3" || colorId === "#8e24aa" || colorId === "#dbadff" ||
+                                                       colorId === "4" || colorId === "#e67c73" || colorId === "#ff887c" ||
+                                                       colorId === "8" || colorId === "#616161" || colorId === "#e1e1e1" ||
+                                                       colorId === "5" || colorId === "#f6bf26" || colorId === "#fbd75b");
+
+                        // Echte System-Feiertage/-Ferien (ohne Farbcode für Personen)
+                        const isSystemHoliday = !isPersonalAppointment && (
+                            event.type === "holiday" || event.type === "ferien" || 
+                            titleLower.includes("feiertag") || 
+                            titleLower.includes("schulferien") ||
+                            titleLower.includes("osterferien") || 
+                            titleLower.includes("sommerferien") || 
+                            titleLower.includes("pfingstferien") || 
+                            titleLower.includes("herbstferien") || 
+                            titleLower.includes("weihnachtsferien") || 
+                            titleLower.includes("faschingsferien") ||
+                            titleLower.includes("neujahr") ||
+                            titleLower.includes("heilige drei könige") ||
+                            titleLower.includes("karfreitag") ||
+                            titleLower.includes("ostermontag") ||
+                            titleLower.includes("tag der arbeit") ||
+                            titleLower.includes("christi himmelfahrt") ||
+                            titleLower.includes("pfingstmontag") ||
+                            titleLower.includes("fronleichnam") ||
+                            titleLower.includes("tag der deutschen einheit") ||
+                            titleLower.includes("reformationstag") ||
+                            titleLower.includes("allerheiligen") ||
+                            titleLower.includes("weihnachtstag")
+                        );
+
+                        if (isSystemHoliday) {
                             isHoliday = true;
+                            // Name ohne Symbole in Spalte 1
                             dayLabels += `<div class="holiday-label">${titleText}</div>`;
                         } 
                         else {
@@ -694,7 +725,6 @@
 
                             const dayLink = getCalendarDayLink(event.start);
                             const titleContent = timeHtml + titleText;
-                            const colorId = event.color; 
                             
                             if (colorId === "1" || colorId === "#7986cb" || colorId === "#a4bdfc") { 
                                 mamaHtml += `<a href="${dayLink}" target="_blank" class="appointment mama" title="Im Google Kalender öffnen">${titleContent}</a>`; 
@@ -712,7 +742,7 @@
                                 papaHtml += `<a href="${dayLink}" target="_blank" class="appointment papa" title="Im Google Kalender öffnen">${titleContent}</a>`; 
                             } 
                             else {
-                                // Gemeinschaftstermine (Alle) komplett ohne Sonnen- oder Stern-Symbol
+                                // Gemeinschaftstermine (Alle) sauber ohne Sonnen- oder Stern-Symbol
                                 allHtml += `<a href="${dayLink}" target="_blank" class="appointment-all" title="Im Google Kalender öffnen">${titleContent}</a>`; 
                             }
                         }
@@ -842,8 +872,12 @@
                 let dayItems = [];
 
                 fetchedEvents.forEach(e => {
-                    const tLow = (e.title || "").toLowerCase();
-                    const isHolidayOrFerien = e.type === "holiday" || e.type === "ferien" || tLow.includes("ferien") || tLow.includes("feiertag");
+                    const titleLower = (e.title || "").toLowerCase();
+                    const isPersonal = (e.color === "1" || e.color === "#7986cb" || e.color === "#a4bdfc" ||
+                                        e.color === "3" || e.color === "#8e24aa" || e.color === "#dbadff" ||
+                                        e.color === "4" || e.color === "#e67c73" || e.color === "#ff887c" ||
+                                        e.color === "8" || e.color === "#616161" || e.color === "#e1e1e1");
+                    const isHolidayOrFerien = !isPersonal && (e.type === "holiday" || e.type === "ferien" || titleLower.includes("ferien") || titleLower.includes("feiertag"));
                     const isBday = e.color === "5" || e.color === "#f6bf26" || e.color === "#fbd75b";
 
                     if (!isHolidayOrFerien && !isBday) {
