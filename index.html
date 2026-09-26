@@ -235,15 +235,22 @@
             word-break: break-word;
         }
 
+        /* Anklickbarer Termin-Kasten (ersetzt die Glocken) */
         .appointment {
+            display: block;
             background: #f9fbf9;
             border-left: 3px solid var(--accent-green);
-            padding: 3px;
+            padding: 3px 4px;
             font-size: 0.7rem;
             border-radius: 2px;
             margin-bottom: 2px;
             line-height: 1.2;
-            position: relative;
+            text-decoration: none;
+            color: #333;
+            transition: background 0.15s;
+        }
+        .appointment:hover {
+            background: #edf5f0;
         }
 
         .appointment.mama { border-left-color: var(--color-mama); }
@@ -251,8 +258,10 @@
         .appointment.clara { border-left-color: var(--color-clara); }
         .appointment.papa { border-left-color: var(--color-papa); }
         .appointment.geburtstag { border-left-color: var(--color-geburtstag); background: #fffde7; }
+        .appointment.geburtstag:hover { background: #fcf8cc; }
 
         .appointment-all {
+            display: block;
             background: #fef3e6;
             border-left: 3px solid #e6953b; 
             padding: 3px 5px;
@@ -263,16 +272,11 @@
             text-align: center;
             margin-bottom: 2px;
             line-height: 1.2;
-        }
-
-        .reminder-bell {
-            font-size: 0.75rem;
-            cursor: pointer;
-            margin-left: 4px;
-            opacity: 0.9;
             text-decoration: none;
-            display: inline-block;
-            vertical-align: middle;
+            transition: background 0.15s;
+        }
+        .appointment-all:hover {
+            background: #fae6cb;
         }
 
         .time-badge {
@@ -681,29 +685,27 @@
                                 timeHtml = `<span class="time-badge">🕒 ${hours}:${minutes}</span>`;
                             }
 
-                            const bellUrl = getCalendarDayLink(event.start);
-                            const bellBtn = `<a href="${bellUrl}" target="_blank" class="reminder-bell" title="Kalendertag öffnen">🔔</a>`;
-
-                            const title = timeHtml + titleText + bellBtn;
+                            const dayLink = getCalendarDayLink(event.start);
+                            const titleContent = timeHtml + titleText;
                             const colorId = event.color; 
                             
                             if (colorId === "1" || colorId === "#7986cb" || colorId === "#a4bdfc") { 
-                                mamaHtml += `<div class="appointment mama">${title}</div>`; 
+                                mamaHtml += `<a href="${dayLink}" target="_blank" class="appointment mama" title="Im Google Kalender öffnen">${titleContent}</a>`; 
                             } 
                             else if (colorId === "3" || colorId === "#8e24aa" || colorId === "#dbadff") { 
-                                jonathanHtml += `<div class="appointment jonathan">${title}</div>`; 
+                                jonathanHtml += `<a href="${dayLink}" target="_blank" class="appointment jonathan" title="Im Google Kalender öffnen">${titleContent}</a>`; 
                             } 
                             else if (colorId === "4" || colorId === "#e67c73" || colorId === "#ff887c") { 
-                                claraHtml += `<div class="appointment clara">${title}</div>`; 
+                                claraHtml += `<a href="${dayLink}" target="_blank" class="appointment clara" title="Im Google Kalender öffnen">${titleContent}</a>`; 
                             } 
                             else if (colorId === "5" || colorId === "#f6bf26" || colorId === "#fbd75b") { 
-                                geburtstagHtml += `<div class="appointment geburtstag">🎂 ${title}</div>`; 
+                                geburtstagHtml += `<a href="${dayLink}" target="_blank" class="appointment geburtstag" title="Im Google Kalender öffnen">🎂 ${titleContent}</a>`; 
                             } 
                             else if (colorId === "8" || colorId === "#616161" || colorId === "#e1e1e1") { 
-                                papaHtml += `<div class="appointment papa">${title}</div>`; 
+                                papaHtml += `<a href="${dayLink}" target="_blank" class="appointment papa" title="Im Google Kalender öffnen">${titleContent}</a>`; 
                             } 
                             else {
-                                allHtml += `<div class="appointment-all">🌟 ${title}</div>`; 
+                                allHtml += `<a href="${dayLink}" target="_blank" class="appointment-all" title="Im Google Kalender öffnen">🌟 ${titleContent}</a>`; 
                             }
                         }
                     }
@@ -876,6 +878,10 @@
                 listContainer.innerHTML = html;
             }
             document.getElementById("eventsModal").style.display = "flex";
+        }
+
+        function changeMonth(description) {
+            // (Funktion unverändert)
         }
 
         function changeMonth(direction) {
