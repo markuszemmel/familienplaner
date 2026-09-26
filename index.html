@@ -175,12 +175,12 @@
             background-color: #d2e4d9;
         }
 
-        /* Dezente pastell-orange Hinterlegung für Feiertage und Schulferien */
+        /* Dezente pastell-flieder Hinterlegung für Feiertage und Schulferien */
         tr.holiday-row td {
-            background-color: #fef5e7 !important; 
+            background-color: #f6f0f8 !important; 
         }
         tr.holiday-row .day-col {
-            background-color: #fdebd0 !important;
+            background-color: #eee4f2 !important;
         }
 
         tr.today-row td {
@@ -227,10 +227,10 @@
             background: #e0eeff;
         }
 
-        /* Feiertags-/Ferien-Text in Spalte 1 (ohne Symbole) */
+        /* Feiertags-/Ferien-Text in Spalte 1 (dezent flieder/violett, ohne BW) */
         .holiday-label {
             font-size: 0.52rem;
-            color: #b9770e;
+            color: #725282;
             margin-top: 2px;
             line-height: 1.1;
             font-weight: bold;
@@ -262,7 +262,7 @@
         .appointment.geburtstag { border-left-color: var(--color-geburtstag); background: #fffde7; }
         .appointment.geburtstag:hover { background: #fcf8cc; }
 
-        /* Gemeinschaftstermine (Alle) ohne Sonnen- oder Stern-Symbol */
+        /* Gemeinschaftstermine (Alle) ohne Symbole */
         .appointment-all {
             display: block;
             background: #fef3e6;
@@ -678,14 +678,12 @@
                         const titleLower = titleText.toLowerCase();
                         const colorId = event.color;
 
-                        // Prüfung, ob es ein persönlicher Termin mit Farbcode ist (z.B. Ferien J oder Ferien C)
                         const isPersonalAppointment = (colorId === "1" || colorId === "#7986cb" || colorId === "#a4bdfc" ||
                                                        colorId === "3" || colorId === "#8e24aa" || colorId === "#dbadff" ||
                                                        colorId === "4" || colorId === "#e67c73" || colorId === "#ff887c" ||
                                                        colorId === "8" || colorId === "#616161" || colorId === "#e1e1e1" ||
                                                        colorId === "5" || colorId === "#f6bf26" || colorId === "#fbd75b");
 
-                        // Echte System-Feiertage/-Ferien (ohne Farbcode für Personen)
                         const isSystemHoliday = !isPersonalAppointment && (
                             event.type === "holiday" || event.type === "ferien" || 
                             titleLower.includes("feiertag") || 
@@ -712,8 +710,13 @@
 
                         if (isSystemHoliday) {
                             isHoliday = true;
-                            // Name ohne Symbole in Spalte 1
-                            dayLabels += `<div class="holiday-label">${titleText}</div>`;
+                            // "Baden-Württemberg" und Regionen-Zusätze sauber herausfiltern
+                            let cleanTitle = titleText
+                                .replace(/Baden-Württemberg/gi, '')
+                                .replace(/[-–]\s*BW\b/gi, '')
+                                .replace(/\(regionaler Feiertag\)/gi, '')
+                                .trim();
+                            dayLabels += `<div class="holiday-label">${cleanTitle}</div>`;
                         } 
                         else {
                             let timeHtml = "";
@@ -742,7 +745,6 @@
                                 papaHtml += `<a href="${dayLink}" target="_blank" class="appointment papa" title="Im Google Kalender öffnen">${titleContent}</a>`; 
                             } 
                             else {
-                                // Gemeinschaftstermine (Alle) sauber ohne Sonnen- oder Stern-Symbol
                                 allHtml += `<a href="${dayLink}" target="_blank" class="appointment-all" title="Im Google Kalender öffnen">${titleContent}</a>`; 
                             }
                         }
