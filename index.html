@@ -175,7 +175,7 @@
             background-color: #d2e4d9;
         }
 
-        /* Dezent farblich hinterlegte Feiertags-/Ferien-Zeilen */
+        /* Dezente farbliche Hinterlegung für echte Feiertage */
         tr.holiday-row td {
             background-color: #f0f6ff !important; 
         }
@@ -225,16 +225,6 @@
         }
         .weather-info:hover {
             background: #e0eeff;
-        }
-
-        /* Dezenter Text für Feiertage / Ferien in Spalte 1 (ohne Symbole) */
-        .holiday-label {
-            font-size: 0.52rem;
-            color: #1c5295;
-            margin-top: 2px;
-            line-height: 1.1;
-            font-weight: bold;
-            word-break: break-word;
         }
 
         /* Anklickbarer Termin-Kasten */
@@ -651,7 +641,6 @@
 
                 let mamaHtml = "", jonathanHtml = "", claraHtml = "", papaHtml = "", geburtstagHtml = "";
                 let allHtml = ""; 
-                let dayLabels = ""; 
                 let isHoliday = false; 
 
                 const dayStart = new Date(currentYear, currentMonth, day, 0, 0, 0);
@@ -676,10 +665,11 @@
                         const titleText = event.title || "Termin";
                         const titleLower = titleText.toLowerCase();
                         
-                        // Erkennung von Feiertagen oder Schulferien zur Zeilen-Einfärbung und Anzeige in Spalte 1 (ohne Symbole)
-                        if (event.type === "holiday" || event.type === "ferien" || titleLower.includes("ferien") || titleLower.includes("feiertag") || titleLower.includes("tag der arbeit") || titleLower.includes("weihnachten") || titleLower.includes("ostern") || titleLower.includes("pfingsten") || titleLower.includes("reformationstag") || titleLower.includes("allerheiligen") || titleLower.includes("neujahr") || titleLower.includes("christi himmelfahrt") || titleLower.includes("fronleichnam") || titleLower.includes("tag der deutschen einheit")) {
+                        // Hier wird geprüft, ob es ein echter Feiertag/Ferientag aus dem System-Kalender ist (zur Zeilen-Einfärbung)
+                        const isSystemHoliday = event.type === "holiday" || event.type === "ferien" || titleLower.includes("feiertag") || titleLower.includes("tag der arbeit") || titleLower.includes("weihnachten") || titleLower.includes("ostern") || titleLower.includes("pfingsten") || titleLower.includes("reformationstag") || titleLower.includes("allerheiligen") || titleLower.includes("neujahr") || titleLower.includes("christi himmelfahrt") || titleLower.includes("fronleichnam") || titleLower.includes("tag der deutschen einheit");
+
+                        if (isSystemHoliday && titleLower.length < 25 && event.color === "") {
                             isHoliday = true;
-                            dayLabels += `<div class="holiday-label">${titleText}</div>`;
                         } 
                         else {
                             let timeHtml = "";
@@ -721,7 +711,6 @@
                     ${pegHtml}<span class="date-num">${day}</span> 
                     <span class="date-day">${dayNameStr.substring(0, 2)}</span>
                     ${weatherHtml}
-                    ${dayLabels}
                 `;
 
                 if (allHtml !== "") {
@@ -839,10 +828,9 @@
 
                 fetchedEvents.forEach(e => {
                     const tLow = (e.title || "").toLowerCase();
-                    const isHolidayOrFerien = e.type === "holiday" || e.type === "ferien" || tLow.includes("ferien") || tLow.includes("feiertag");
                     const isBday = e.color === "5" || e.color === "#f6bf26" || e.color === "#fbd75b";
 
-                    if (!isHolidayOrFerien && !isBday) {
+                    if (!isBday) {
                         const evStart = new Date(e.start);
                         const evEnd = new Date(e.end);
 
