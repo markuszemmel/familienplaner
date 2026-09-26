@@ -323,21 +323,22 @@
             transform: scale(1.08);
         }
 
-        /* Schwebender Aktualisieren-Button über dem + Button */
+        /* Schwebender Aktualisieren-Button */
         .refresh-fab-btn {
             position: fixed;
             bottom: 78px;
             right: 20px;
-            width: 38px;
-            height: 38px;
-            background-color: #27ae60;
+            width: 48px;
+            height: 48px;
+            background-color: var(--header-green);
             color: white;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.2rem;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+            font-size: 1.5rem;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             cursor: pointer;
             border: 2px solid white;
             z-index: 99;
@@ -405,8 +406,8 @@
             th, td { font-size: 0.7rem; padding: 3px 2px; }
             thead th { font-size: 0.7rem; padding: 6px 1px; }
             .col-tag { width: 44px; }
-            .fab-btn { bottom: 15px; right: 15px; width: 44px; height: 44px; font-size: 1.6rem; }
-            .refresh-fab-btn { bottom: 67px; right: 15px; width: 34px; height: 34px; font-size: 1rem; }
+            .fab-btn { bottom: 15px; right: 15px; width: 48px; height: 48px; font-size: 1.8rem; }
+            .refresh-fab-btn { bottom: 72px; right: 15px; width: 48px; height: 48px; font-size: 1.5rem; }
         }
     </style>
 </head>
@@ -445,7 +446,7 @@
         </div>
     </div>
 
-    <!-- Schwebender Aktualisieren-Button über dem + Button -->
+    <!-- Schwebender Aktualisieren-Button -->
     <div class="refresh-fab-btn" onclick="manualRefresh()" title="Kalender aktualisieren">↻</div>
 
     <!-- Schwebender + Button -->
@@ -488,15 +489,24 @@
         const daysNames = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
 
         const todayObj = new Date();
-        let currentYear = todayObj.getFullYear();
-        let currentMonth = todayObj.getMonth();
+        let currentYear, currentMonth;
+
+        // Gespeicherten Monat auslesen, falls vorhanden (damit Pull-to-Refresh den Monat behält)
+        const savedMonth = sessionStorage.getItem("cal_month");
+        const savedYear = sessionStorage.getItem("cal_year");
+
+        if (savedMonth !== null && savedYear !== null) {
+            currentMonth = parseInt(savedMonth);
+            currentYear = parseInt(savedYear);
+        } else {
+            currentMonth = todayObj.getMonth();
+            currentYear = todayObj.getFullYear();
+        }
+
         let fetchedEvents = [];
         let weatherData = {};
 
         window.onload = function() {
-            // Beim Start immer zum heutigen Tag / Monat springen
-            goToToday();
-            
             const cachedData = localStorage.getItem("family_calendar_cache");
             if (cachedData) {
                 try {
@@ -506,8 +516,13 @@
             }
             
             fetchWeather();
-            fetchCalendarEvents(false);
+            fetchCalendarEvents();
         };
+
+        function saveCurrentPosition() {
+            sessionStorage.setItem("cal_month", currentMonth);
+            sessionStorage.setItem("cal_year", currentYear);
+        }
 
         function fetchWeather() {
             const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max,windspeed_10m_max&timezone=Europe%2FBerlin`;
@@ -580,7 +595,7 @@
             document.getElementById(modalId).style.display = "none";
         }
 
-        function fetchCalendarEvents(resetToToday = false) {
+        function fetchCalendarEvents() {
             const display = document.getElementById("monthYearDisplay");
             
             if (fetchedEvents.length === 0) {
@@ -592,12 +607,7 @@
                 .then(data => {
                     fetchedEvents = data || [];
                     localStorage.setItem("family_calendar_cache", JSON.stringify(fetchedEvents));
-                    
-                    if (resetToToday) {
-                        goToToday();
-                    } else {
-                        renderCalendar();
-                    }
+                    renderCalendar();
                 })
                 .catch(error => {
                     console.error("Fehler beim Abrufen:", error);
@@ -607,8 +617,11 @@
         }
 
         function manualRefresh() {
-            // Nur Daten holen, aktueller Monat bleibt stur erhalten
-            fetchCalendarEvents(false);
+            const btn = document.querySelector('.refresh-fab-btn');
+            btn.style.transform = "rotate(360deg)";
+            setTimeout(() => { btn.style.transform = "none"; }, 400);
+
+            fetchCalendarEvents();
         }
 
         function getCalendarDayLink(startDate) {
@@ -621,6 +634,7 @@
         }
 
         function renderCalendar() {
+            saveCurrentPosition(); // Aktuellen Monat immer speichern
             document.getElementById("monthYearDisplay").innerText = monthsNames[currentMonth] + " " + currentYear;
             const tbody = document.getElementById("calendarBody");
             tbody.innerHTML = "";
@@ -758,26 +772,57 @@
                     tbody.appendChild(row);
                 }
             }
-
-            setTimeout(() => {
-                const container = document.getElementById("tableContainer");
-                const isThisMonth = (currentMonth === todayObj.getMonth() && currentYear === todayObj.getFullYear());
-                const todayElem = document.getElementById("todayElement");
-
-                if (isThisMonth && todayElem) {
-                    todayElem.scrollIntoView({ behavior: "smooth", block: "center" });
-                } else if (container) {
-                    container.scrollTop = 0;
-                }
-            }, 300);
         }
 
         function goToToday() {
             currentYear = todayObj.getFullYear();
             currentMonth = todayObj.getMonth();
+            saveCurrentPosition();
             renderCalendar();
+            
+            // Zum HEUTIGEN Tag scrollen
+            setTimeout(() => {
+                const todayElem = document.getElementById("todayElement");
+                if (todayElem) {
+                    todayElem.scrollIntoView({ behavior: "smooth", block: "center" });
+                }
+            }, 200);
         }
 
+        function checkUpcomingBirthdays() {
+            const now = new Date();
+            const in28Days = new Date();
+            in28Days.setDate(now.getDate() + 28);
+
+            let upcoming = [];
+
+            fetchedEvents.forEach(e => {
+                if (e.color === "5" || e.color === "#f6bf26" || e.color === "#fbd75b") {
+                    const evDate = new Date(e.start);
+                    if (evDate >= now && evDate <= in28Days) {
+                        const dayStr = evDate.getDate().toString().padStart(2, '0');
+                        const monthStr = (evDate.getMonth() + 1).toString().padStart(2, '0');
+                        upcoming.push({ name: e.title, date: `${dayStr}.${monthStr}.`, fullDate: evDate });
+                    }
+                }
+            });
+
+            upcoming.sort((a, b) => a.fullDate - b.fullDate);
+
+            const listContainer = document.getElementById("bdayList");
+            if (upcoming.length === 0) {
+                listContainer.innerHTML = `<div style="font-size:0.85rem; color:#666; padding:10px;">In den nächsten 4 Wochen stehen keine Geburtstage an.</div>`;
+            } else {
+                let html = "";
+                upcoming.getItem = upcoming.forEach(item => {
+                    html += `<div class="modal-item">🎂 <strong>${item.date}</strong> - ${item.name}</div>`;
+                });
+                listContainer.innerHTML = html;
+            }
+            document.getElementById("bdayModal").style.display = "flex";
+        }
+
+        // Korrektur für die Geburtstags-Schleife oben
         function checkUpcomingBirthdays() {
             const now = new Date();
             const in28Days = new Date();
@@ -882,12 +927,12 @@
             currentMonth += direction;
             if (currentMonth > 11) { currentMonth = 0; currentYear++; }
             else if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+            saveCurrentPosition();
             renderCalendar(); 
         }
 
-        // Beim Zurückkehren aus der App holen wir die Daten frisch, behalten aber den Monat bei
         window.addEventListener('pageshow', function(event) {
-            fetchCalendarEvents(false);
+            fetchCalendarEvents();
         });
     </script>
 
