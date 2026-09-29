@@ -1,0 +1,8 @@
+{
+  "name": "Familienplaner",
+  "short_name": "Planer",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fcf8f2",
+  "theme_color": "#334155"
+}
