@@ -5,19 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Familienplaner - Google Kalender</title>
     
-    <!-- Professionelles Vektor-App-Icon (läuft fehlerfrei auf allen Smartphones) -->
-    <link rel="manifest" href='data:application/manifest+json;charset=utf-8,{"name":"Familienplaner","short_name":"Planer","start_url":"./","display":"standalone","background_color":"%23f1f5f9","theme_color":"%23334155","icons":[{"src":"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMCIgZmlsbD0iIzMzNDE1NSIvPjxyZWN0IHg9Ijk2IiB5PSI5NiIgd2lkdGg9IjMyMCIgaGVpZ2h0PSI4MCIgcng9IjIwIiBmaWxsPSIjZTExZDQ4Ii8+PHJlY3QgeD0jk2IiB5PSIxNDYiIHdpZHRoPSIzMjAiIGhlaWdodD0iMjcwIiByZz0iMjAiIGZpbGw9IiNmZmZmZmYiLz48cmVjdCB4PSIxNjAiIHk9IjYwIiB3aWR0aD0iMzIiIGhlaWdodD0iNjAiIHJ4PSIxNiIgZmlsbD0iIzk0YTNiOCIvPjxyZWN0IHg9IjMyMCIgeT0iNjAiIHdpZHRoPSIzMiIgaGVpZ2h0PSI2MCIgcng9IjE2IiBmaWxsPSIjOTRhM2I4Ii8+PGNpcmNsZSBjeD0iMTgwIiBjeT0iMjMwIiByPSIyMCIgZmlsbD0iI2NiZDVlMSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzMCIgcj0iMjAiIGZpbGw9IiNjYmQ1ZTEiLz48Y2lyY2xlIGN4PSIzMzIiIGN5PSIyMzAiIHI9IjIwIiBmaWxsPSIjZTExZDQ4Ii8+PGNpcmNsZSBjeD0iMTgwIiBjeT0iMzEwIiByPSIyMCIgZmlsbD0iI2NiZDVlMSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjMxMCIgcj0iMjAiIGZpbGw9IiNjYmQ1ZTEiLz48Y2lyY2xlIGN4PSIzMzIiIGN5PSIzMTAi IHI9IjIwIiBmaWxsPSIjY2JkNWUxIi8+PC9zdmc+","sizes":"512x512","type":"image/svg+xml"}]}'>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMCIgZmlsbD0iIzMzNDE1NSIvPjxyZWN0IHg9Ijk2IiB5PSI5NiIgd2lkdGg9IjMyMCIgaGVpZ2h0PSI4MCIgcng9IjIwIiBmaWxsPSIjZTExZDQ4Ii8+PHJlY3QgeD0jk2IiB5PSIxNDYiIHdpZHRoPSIzMjAiIGhlaWdodD0iMjcwIiByZz0iMjAiIGZpbGw9IiNmZmZmZmYiLz48cmVjdCB4PSIxNjAiIHk9IjYwIiB3aWR0aD0iMzIiIGhlaWdodD0iNjAiIHJ4PSIxNiIgZmlsbD0iIzk0YTNiOCIvPjxyZWN0IHg9IjMyMCIgeT0iNjAiIHdpZHRoPSIzMiIgaGVpZ2h0PSI2MCIgcng9IjE2IiBmaWxsPSIjOTRhM2I4Ii8+PGNpcmNsZSBjeD0iMTgwIiBjeT0iMjMwIiByPSIyMCIgZmlsbD0iI2NiZDVlMSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzMCIgcj0iMjAiIGZpbGw9IiNjYmQ1ZTEiLz48Y2lyY2xlIGN4PSIzMzIiIGN5PSIyMzAiIHI9IjIwIiBmaWxsPSIjZTExZDQ4Ii8+PGNpcmNsZSBjeD0iMTgwIiBjeT0iMzEwIiByPSIyMCIgZmlsbD0iI2NiZDVlMSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjMxMCIgcj0iMjAiIGZpbGw9IiNjYmQ1ZTEiLz48Y2lyY2xlIGN4PSIzMzIiIGN5PSIzMTAi IHI9IjIwIiBmaWxsPSIjY2JkNWUxIi8+PC9zdmc+">
-    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMCIgZmlsbD0iIzMzNDE1NSIvPjxyZWN0IHg9Ijk2IiB5PSI5NiIgd2lkdGg9IjMyMCIgaGVpZ2h0PSI4MCIgcng9IjIwIiBmaWxsPSIjZTExZDQ4Ii8+PHJlY3QgeD0jk2IiB5PSIxNDYiIHdpZHRoPSIzMjAiIGhlaWdodD0iMjcwIiByZz0iMjAiIGZpbGw9IiNmZmZmZmYiLz48cmVjdCB4PSIxNjAiIHk9IjYwIiB3aWR0aD0iMzIiIGhlaWdodD0iNjAiIHJ4PSIxNiIgZmlsbD0iIzk0YTNiOCIvPjxyZWN0IHg9IjMyMCIgeT0iNjAiIHdpZHRoPSIzMiIgaGVpZ2h0PSI2MCIgcng9IjE2IiBmaWxsPSIjOTRhM2I4Ii8+PGNpcmNsZSBjeD0iMTgwIiBjeT0iMjMwIiByPSIyMCIgZmlsbD0iI2NiZDVlMSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjIzMCIgcj0iMjAiIGZpbGw9IiNjYmQ1ZTEiLz48Y2lyY2xlIGN4PSIzMzIiIGN5PSIyMzAiIHI9IjIwIiBmaWxsPSIjZTExZDQ4Ii8+PGNpcmNsZSBjeD0iMTgwIiBjeT0iMzEwIiByPSIyMCIgZmlsbD0iI2NiZDVlMSIvPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjMxMCIgcj0iMjAiIGZpbGw9IiNjYmQ1ZTEiLz48Y2lyY2xlIGN4PSIzMzIiIGN5PSIzMTAi IHI9IjIwIiBmaWxsPSIjY2JkNWUxIi8+PC9zdmc+">
+    <!-- Echte Verknüpfung zur manifest.json für den Vollbildmodus -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
 
     <style>
         :root {
             --bg-color: #f1f5f9;
-            --container-bg: #ffffff;
-            --grid-line: #cbd5e1;
+            --container-bg: #fcf8f2; /* Edler Pergament-Ton */
+            --grid-line: #d8cbd0;
             --header-dark: #334155; 
             --accent-color: #0f172a;
-            --weekend-bg: #f8fafc;
+            --weekend-bg: #f7f2ea;
             --today-bg: #fefce8;
 
             --color-mama-bg: #f5f7ff; --color-mama-border: #c7d2fe; --color-mama-text: #312e81;
@@ -74,9 +74,9 @@
         }
 
         .nav-btn {
-            background-color: #f8fafc;
+            background-color: #f7f2ea;
             color: var(--header-dark);
-            border: 1px solid #94a3b8;
+            border: 1px solid #b8a99a;
             padding: 5px 10px;
             border-radius: 6px;
             cursor: pointer;
@@ -85,7 +85,7 @@
             white-space: nowrap;
             transition: background 0.2s;
         }
-        .nav-btn:hover { background-color: #e2e8f0; }
+        .nav-btn:hover { background-color: #ede5da; }
 
         .action-buttons-row {
             display: flex;
@@ -134,7 +134,7 @@
             overflow-y: auto;
             border: 1px solid var(--grid-line);
             border-radius: 6px;
-            background: #fff;
+            background: var(--container-bg);
             scroll-behavior: smooth;
         }
 
@@ -142,7 +142,7 @@
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
-            background: #fff;
+            background: var(--container-bg);
         }
 
         th, td {
@@ -178,7 +178,7 @@
 
         .day-col {
             text-align: center;
-            background-color: #f8fafc;
+            background-color: #f5f0e6;
             font-weight: 600;
             color: #334155;
             position: relative;
@@ -188,14 +188,14 @@
             background-color: var(--weekend-bg);
         }
         .weekend .day-col {
-            background-color: #f1f5f9;
+            background-color: #eee7dc;
         }
 
         tr.holiday-row td {
-            background-color: #f6fdf9 !important; 
+            background-color: #f0fdf4 !important; 
         }
         tr.holiday-row .day-col {
-            background-color: #f0fdf4 !important;
+            background-color: #dcfce7 !important;
             color: #065f46;
         }
         .holiday-label {
@@ -233,7 +233,7 @@
 
         .date-day {
             font-size: 0.58rem;
-            color: #475569;
+            color: #57534e;
             display: block;
             text-transform: uppercase;
         }
@@ -247,11 +247,11 @@
             cursor: pointer;
             padding: 1px;
             border-radius: 3px;
-            background: rgba(255,255,255,0.9);
+            background: rgba(252,248,242,0.95);
             display: inline-block;
         }
         .weather-info:hover {
-            background: #e2e8f0;
+            background: #ede5da;
         }
 
         .appointment {
@@ -327,7 +327,7 @@
             align-items: center;
         }
         .modal-content {
-            background-color: #fff;
+            background-color: #fcf8f2;
             padding: 20px;
             border-radius: 12px;
             max-width: 350px;
@@ -346,7 +346,7 @@
             margin: 8px 0;
             color: #1e293b;
             text-align: left;
-            border-bottom: 1px solid #f1f5f9;
+            border-bottom: 1px solid #ede5da;
             padding-bottom: 6px;
             line-height: 1.35;
         }
@@ -493,7 +493,7 @@
                             const tMax = Math.round(data.daily.temperature_2m_max[i]);
                             const tMin = Math.round(data.daily.temperature_2m_min[i]);
                             const rainProb = data.daily.precipitation_probability_max ? data.daily.precipitation_probability_max[i] : 0;
-                            const wind = data.daily.windspeed_10m_max ? Math.round(data.daily.windspeed_10m_max[i]) : 0;
+                            const wind = data.daily.windspeed_10m_max ? Math.round(data.daily.windspeed_10m_max[i] ) : 0;
 
                             weatherData[dateStr] = { 
                                 icon: getWeatherIcon(code), 
@@ -515,7 +515,7 @@
             if (code >= 1 && code <= 3) return "⛅";
             if (code >= 45 && code <= 48) return "🌫️";
             if (code >= 51 && code <= 67) return "🌧️";
-            if (code >= 71 && code <= 77) return "❄️";
+            if (code >= 71 && code <= 77) return "❄️️";
             if (code >= 80 && code <= 82) return "🌦️";
             if (code >= 95) return "🌩️";
             return "🌡️";
@@ -882,7 +882,7 @@
                                         e.color === "3" || e.color === "#8e24aa" || e.color === "#dbadff" ||
                                         e.color === "4" || e.color === "#e67c73" || e.color === "#ff887c" ||
                                         e.color === "8" || e.color === "#616161" || e.color === "#e1e1e1");
-                    const isHolidayOrFerien = !isPersonal && (e.type === "holiday" || e.type === "ferien" || titleLower.includes("ferien" ) || titleLower.includes("feiertag"));
+                    const isHolidayOrFerien = !isPersonal && (e.type === "holiday" || e.type === "ferien" || titleLower.includes("ferien") || titleLower.includes("feiertag"));
                     const isBday = e.color === "5" || e.color === "#f6bf26" || e.color === "#fbd75b";
 
                     if (!isHolidayOrFerien && !isBday) {
