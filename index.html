@@ -25,7 +25,7 @@
             --color-clara-bg: #fff5f5; --color-clara-border: #fecdd3; --color-clara-text: #881337;
             --color-papa-bg: #f8fafc; --color-papa-border: #cbd5e1; --color-papa-text: #1e293b;
             
-            /* Etwas blassere, harmonischere Töne für Geburtstage und ganztägige Termine */
+            /* Blassere Töne für Geburtstage und ganztägige Termine */
             --color-geburtstag-bg: #fef9c3; --color-geburtstag-border: #eab308; --color-geburtstag-text: #713f12;
             --color-all-bg: #ffedd5; --color-all-border: #fb923c; --color-all-text: #7c2d12;
         }
@@ -193,19 +193,20 @@
             background-color: #eae3d8;
         }
 
+        /* Dezentes, pastelliges blasses Hellrot für Feiertage / Ferien */
         tr.holiday-row td {
-            background-color: #f0fdf4 !important; 
+            background-color: #fef2f2 !important; 
         }
         tr.holiday-row .day-col {
-            background-color: #dcfce7 !important;
-            color: #065f46;
+            background-color: #fee2e2 !important;
+            color: #991b1b;
         }
         .holiday-label {
             font-size: 0.48rem;
-            color: #047857;
+            color: #b91c1c;
             margin-top: 1px;
             line-height: 1.1;
-            font-weight: 700;
+            font-weight: 500;
             word-break: break-word;
         }
 
@@ -276,8 +277,11 @@
         .appointment.jonathan { background: var(--color-jonathan-bg); border-color: var(--color-jonathan-border); color: var(--color-jonathan-text); }
         .appointment.clara { background: var(--color-clara-bg); border-color: var(--color-clara-border); color: var(--color-clara-text); }
         .appointment.papa { background: var(--color-papa-bg); border-color: var(--color-papa-border); color: var(--color-papa-text); }
-        .appointment.geburtstag { background: var(--color-geburtstag-bg); border-color: var(--color-geburtstag-border); color: var(--color-geburtstag-text); font-weight: 700; }
+        
+        /* Schrift bei Geburtstagen weniger kräftig gemacht (font-weight: 500 statt 700) */
+        .appointment.geburtstag { background: var(--color-geburtstag-bg); border-color: var(--color-geburtstag-border); color: var(--color-geburtstag-text); font-weight: 500; }
 
+        /* Schrift bei ganztägigen Terminen ebenfalls weniger kräftig (font-weight: 500 statt 700) */
         .appointment-all {
             display: block;
             background: var(--color-all-bg);
@@ -286,7 +290,7 @@
             padding: 3px 4px;
             font-size: 0.68rem;
             border-radius: 5px;
-            font-weight: 700;
+            font-weight: 500;
             text-align: center;
             margin-bottom: 2px;
             line-height: 1.2;
@@ -515,7 +519,7 @@
         function getWeatherIcon(code) {
             if (code === 0) return "☀️";
             if (code >= 1 && code <= 3) return "⛅";
-            if (code >= 45 && code <= 48) return "🌫️️";
+            if (code >= 45 && code <= 48) return "🌫️";
             if (code >= 51 && code <= 67) return "🌧️";
             if (code >= 71 && code <= 77) return "❄️";
             if (code >= 80 && code <= 82) return "🌦️";
