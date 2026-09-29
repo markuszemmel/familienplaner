@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Familienplaner - Google Kalender</title>
     
-    <!-- Echte Verknüpfung zur manifest.json für den Vollbildmodus -->
+    <!-- Verknüpfung zur manifest.json -->
     <link rel="manifest" href="manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,11 +13,11 @@
     <style>
         :root {
             --bg-color: #f1f5f9;
-            --container-bg: #fcf8f2; /* Edler Pergament-Ton */
-            --grid-line: #d8cbd0;
+            --container-bg: #fbf9f5; /* Edler Elfenbein-Ton */
+            --grid-line: #e2d9ce;
             --header-dark: #334155; 
             --accent-color: #0f172a;
-            --weekend-bg: #f7f2ea;
+            --weekend-bg: #f5f1ea;
             --today-bg: #fefce8;
 
             --color-mama-bg: #f5f7ff; --color-mama-border: #c7d2fe; --color-mama-text: #312e81;
@@ -74,9 +74,9 @@
         }
 
         .nav-btn {
-            background-color: #f7f2ea;
+            background-color: #f5f1ea;
             color: var(--header-dark);
-            border: 1px solid #b8a99a;
+            border: 1px solid #d4c7bc;
             padding: 5px 10px;
             border-radius: 6px;
             cursor: pointer;
@@ -85,7 +85,7 @@
             white-space: nowrap;
             transition: background 0.2s;
         }
-        .nav-btn:hover { background-color: #ede5da; }
+        .nav-btn:hover { background-color: #eae3d8; }
 
         .action-buttons-row {
             display: flex;
@@ -178,7 +178,7 @@
 
         .day-col {
             text-align: center;
-            background-color: #f5f0e6;
+            background-color: #f2ece1;
             font-weight: 600;
             color: #334155;
             position: relative;
@@ -188,7 +188,7 @@
             background-color: var(--weekend-bg);
         }
         .weekend .day-col {
-            background-color: #eee7dc;
+            background-color: #eae3d8;
         }
 
         tr.holiday-row td {
@@ -247,11 +247,11 @@
             cursor: pointer;
             padding: 1px;
             border-radius: 3px;
-            background: rgba(252,248,242,0.95);
+            background: rgba(251,249,245,0.95);
             display: inline-block;
         }
         .weather-info:hover {
-            background: #ede5da;
+            background: #eae3d8;
         }
 
         .appointment {
@@ -327,7 +327,7 @@
             align-items: center;
         }
         .modal-content {
-            background-color: #fcf8f2;
+            background-color: #fbf9f5;
             padding: 20px;
             border-radius: 12px;
             max-width: 350px;
@@ -346,7 +346,7 @@
             margin: 8px 0;
             color: #1e293b;
             text-align: left;
-            border-bottom: 1px solid #ede5da;
+            border-bottom: 1px solid #eae3d8;
             padding-bottom: 6px;
             line-height: 1.35;
         }
@@ -493,7 +493,7 @@
                             const tMax = Math.round(data.daily.temperature_2m_max[i]);
                             const tMin = Math.round(data.daily.temperature_2m_min[i]);
                             const rainProb = data.daily.precipitation_probability_max ? data.daily.precipitation_probability_max[i] : 0;
-                            const wind = data.daily.windspeed_10m_max ? Math.round(data.daily.windspeed_10m_max[i] ) : 0;
+                            const wind = data.daily.windspeed_10m_max ? Math.round(data.daily.windspeed_10m_max[i]) : 0;
 
                             weatherData[dateStr] = { 
                                 icon: getWeatherIcon(code), 
@@ -515,7 +515,7 @@
             if (code >= 1 && code <= 3) return "⛅";
             if (code >= 45 && code <= 48) return "🌫️";
             if (code >= 51 && code <= 67) return "🌧️";
-            if (code >= 71 && code <= 77) return "❄️️";
+            if (code >= 71 && code <= 77) return "❄️";
             if (code >= 80 && code <= 82) return "🌦️";
             if (code >= 95) return "🌩️";
             return "🌡️";
