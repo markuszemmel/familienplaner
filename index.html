@@ -500,7 +500,7 @@
             if (code >= 71 && code <= 77) return "❄️";
             if (code >= 80 && code <= 82) return "🌦️";
             if (code >= 95) return "🌩️";
-            return "🌡️";
+            return "🌡️️";
         }
 
         function getWeatherText(code) {
@@ -570,7 +570,7 @@
             return `https://calendar.google.com/calendar/r/day/${yyyy}/${mm}/${dd}`;
         }
 
-        // Absolut stabiler lokaler Datumsparser (verhindert jegliches Verrutschen durch Zeitzonen)
+        // Felsfester lokaler Parser: Verhindert jegliche UTC-Verschiebungen bei ganztägigen / Mitternachts-Terminen
         function parseEventDate(dateStr, isAllDay) {
             if (!dateStr) return new Date();
             if (typeof dateStr === 'string') {
@@ -580,17 +580,14 @@
                     const month = parseInt(match[2], 10) - 1;
                     const day = parseInt(match[3], 10);
                     
-                    if (isAllDay || !match[4]) {
+                    // Wenn es ein ganztägiger Termin ist oder exakt um Mitternacht (UTC) liegt, als reines Lokaldatum behandeln
+                    if (isAllDay || dateStr.length === 10 || (match[4] === '00' && match[5] === '00' && dateStr.endsWith('Z'))) {
                         return new Date(year, month, day, 0, 0, 0);
-                    } else {
-                        if (dateStr.endsWith('Z') || dateStr.includes('+') || (dateStr.includes('-') && dateStr.lastIndexOf('-') > 10)) {
-                            return new Date(dateStr);
-                        } else {
-                            const hour = parseInt(match[4], 10);
-                            const minute = parseInt(match[5], 10);
-                            const second = parseInt(match[6] || 0, 10);
-                            return new Date(year, month, day, hour, minute, second);
-                        }
+                    } else if (match[4]) {
+                        const hour = parseInt(match[4], 10);
+                        const minute = parseInt(match[5], 10);
+                        const second = parseInt(match[6] || 0, 10);
+                        return new Date(year, month, day, hour, minute, second);
                     }
                 }
             }
