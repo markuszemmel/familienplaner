@@ -562,7 +562,7 @@
         }
 
         function getCalendarDayLink(startDate) {
-            const evDate = parseLocalDate(startDate, false);
+            const evDate = parseEventDate(startDate, false);
             const yyyy = evDate.getFullYear();
             const mm = String(evDate.getMonth() + 1).padStart(2, '0');
             const dd = String(evDate.getDate()).padStart(2, '0');
@@ -570,28 +570,13 @@
             return `https://calendar.google.com/calendar/r/day/${yyyy}/${mm}/${dd}`;
         }
 
-        // Exakter lokaler Datumskonverter ohne UTC-Verschiebungsfehler
-        function parseLocalDate(dateStr, isAllDay) {
+        // Korrigierter Parser: Unterscheidet exakt zwischen ganztägig (lokales Datum) und mit Uhrzeit (ISO mit Zeitzone)
+        function parseEventDate(dateStr, isAllDay) {
             if (!dateStr) return new Date();
-            if (typeof dateStr === 'string') {
-                const datePart = dateStr.split('T')[0];
-                const parts = datePart.split('-');
+            if (isAllDay || (typeof dateStr === 'string' && dateStr.length === 10 && !dateStr.includes('T'))) {
+                const parts = dateStr.split('T')[0].split('-');
                 if (parts.length === 3) {
-                    const year = parseInt(parts[0], 10);
-                    const month = parseInt(parts[1], 10) - 1;
-                    const day = parseInt(parts[2], 10);
-                    if (isAllDay || dateStr.length === 10) {
-                        return new Date(year, month, day);
-                    }
-                    const timePart = dateStr.split('T')[1];
-                    if (timePart) {
-                        const timeParts = timePart.replace('Z', '').split(':');
-                        const hour = parseInt(timeParts[0] || 0, 10);
-                        const minute = parseInt(timeParts[1] || 0, 10);
-                        const second = parseInt(timeParts[2] || 0, 10);
-                        return new Date(year, month, day, hour, minute, second);
-                    }
-                    return new Date(year, month, day);
+                    return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
                 }
             }
             return new Date(dateStr);
@@ -663,8 +648,8 @@
                 }
 
                 fetchedEvents.forEach(event => {
-                    const evStart = parseLocalDate(event.start, event.allDay);
-                    const evEnd = parseLocalDate(event.end, event.allDay);
+                    const evStart = parseEventDate(event.start, event.allDay);
+                    const evEnd = parseEventDate(event.end, event.allDay);
 
                     if (evStart <= dayEnd && evEnd > dayStart) {
                         const titleText = event.title || "Termin";
@@ -713,8 +698,8 @@
                         else {
                             let timeHtml = "";
                             if (!event.allDay) {
-                                const hours = evStart.getHours().toString().padStart(2, '0');
-                                const minutes = evStart.getMinutes().toString().padStart(2, '0');
+                                const hours = String(evStart.getHours()).padStart(2, '0');
+                                const minutes = String(evStart.getMinutes()).padStart(2, '0');
                                 timeHtml = `<span class="time-badge">🕒 ${hours}:${minutes}</span>`;
                             }
 
@@ -834,7 +819,7 @@
 
             fetchedEvents.forEach(e => {
                 if (e.color === "5" || e.color === "#f6bf26" || e.color === "#fbd75b") {
-                    const evDate = parseLocalDate(e.start, e.allDay);
+                    const evDate = parseEventDate(e.start, e.allDay);
                     evDate.setHours(0, 0, 0, 0);
 
                     if (evDate >= now && evDate <= in28Days) {
@@ -895,8 +880,8 @@
                     const isBday = e.color === "5" || e.color === "#f6bf26" || e.color === "#fbd75b";
 
                     if (!isHolidayOrFerien && !isBday) {
-                        const evStart = parseLocalDate(e.start, e.allDay);
-                        const evEnd = parseLocalDate(e.end, e.allDay);
+                        const evStart = parseEventDate(e.start, e.allDay);
+                        const evEnd = parseEventDate(e.end, e.allDay);
 
                         if (evStart <= dayEnd && evEnd > dayStart) {
                             const parsed = parseMultiPerson(e.title || "Termin");
@@ -913,9 +898,9 @@
                             }
 
                             let timeStr = "";
-                            if (!e.allDay) {
-                                const hh = evStart.getHours().toString().padStart(2, '0');
-                                const mm = evStart.getMinutes().toString().padStart(2, '0');
+                            if (!event.allDay) {
+                                const hh = String(evStart.getHours()).padStart(2, '0');
+                                const mm = String(evStart.getMinutes()).padStart(2, '0');
                                 timeStr = ` (🕒 ${hh}:${mm})`;
                             }
 
