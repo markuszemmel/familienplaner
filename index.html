@@ -500,7 +500,7 @@
             if (code >= 71 && code <= 77) return "❄️";
             if (code >= 80 && code <= 82) return "🌦️";
             if (code >= 95) return "🌩️";
-            return "🌡️️";
+            return "🌡️";
         }
 
         function getWeatherText(code) {
@@ -562,36 +562,12 @@
         }
 
         function getCalendarDayLink(startDate) {
-            const evDate = parseEventDate(startDate, false);
+            const evDate = new Date(startDate);
             const yyyy = evDate.getFullYear();
             const mm = String(evDate.getMonth() + 1).padStart(2, '0');
             const dd = String(evDate.getDate()).padStart(2, '0');
             
             return `https://calendar.google.com/calendar/r/day/${yyyy}/${mm}/${dd}`;
-        }
-
-        // Felsfester lokaler Parser: Verhindert jegliche UTC-Verschiebungen bei ganztägigen / Mitternachts-Terminen
-        function parseEventDate(dateStr, isAllDay) {
-            if (!dateStr) return new Date();
-            if (typeof dateStr === 'string') {
-                const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}):(\d{2}))?/);
-                if (match) {
-                    const year = parseInt(match[1], 10);
-                    const month = parseInt(match[2], 10) - 1;
-                    const day = parseInt(match[3], 10);
-                    
-                    // Wenn es ein ganztägiger Termin ist oder exakt um Mitternacht (UTC) liegt, als reines Lokaldatum behandeln
-                    if (isAllDay || dateStr.length === 10 || (match[4] === '00' && match[5] === '00' && dateStr.endsWith('Z'))) {
-                        return new Date(year, month, day, 0, 0, 0);
-                    } else if (match[4]) {
-                        const hour = parseInt(match[4], 10);
-                        const minute = parseInt(match[5], 10);
-                        const second = parseInt(match[6] || 0, 10);
-                        return new Date(year, month, day, hour, minute, second);
-                    }
-                }
-            }
-            return new Date(dateStr);
         }
 
         function parseMultiPerson(title) {
@@ -660,8 +636,8 @@
                 }
 
                 fetchedEvents.forEach(event => {
-                    const evStart = parseEventDate(event.start, event.allDay);
-                    const evEnd = parseEventDate(event.end, event.allDay);
+                    const evStart = new Date(event.start);
+                    const evEnd = new Date(event.end);
 
                     if (evStart <= dayEnd && evEnd > dayStart) {
                         const titleText = event.title || "Termin";
@@ -831,7 +807,7 @@
 
             fetchedEvents.forEach(e => {
                 if (e.color === "5" || e.color === "#f6bf26" || e.color === "#fbd75b") {
-                    const evDate = parseEventDate(e.start, e.allDay);
+                    const evDate = new Date(e.start);
                     evDate.setHours(0, 0, 0, 0);
 
                     if (evDate >= now && evDate <= in28Days) {
@@ -892,8 +868,8 @@
                     const isBday = e.color === "5" || e.color === "#f6bf26" || e.color === "#fbd75b";
 
                     if (!isHolidayOrFerien && !isBday) {
-                        const evStart = parseEventDate(e.start, e.allDay);
-                        const evEnd = parseEventDate(e.end, e.allDay);
+                        const evStart = new Date(e.start);
+                        const evEnd = new Date(e.end);
 
                         if (evStart <= dayEnd && evEnd > dayStart) {
                             const parsed = parseMultiPerson(e.title || "Termin");
@@ -910,7 +886,7 @@
                             }
 
                             let timeStr = "";
-                            if (!event.allDay) {
+                            if (!e.allDay) {
                                 const hh = String(evStart.getHours()).padStart(2, '0');
                                 const mm = String(evStart.getMinutes()).padStart(2, '0');
                                 timeStr = ` (🕒 ${hh}:${mm})`;
