@@ -123,7 +123,6 @@
             border: 1px solid var(--grid-line);
             background: #fff;
             scroll-behavior: smooth;
-            padding-bottom: 90px; /* Verhindert, dass die FABs den Inhalt am Monatsende verdecken */
         }
 
         table {
@@ -154,7 +153,7 @@
             text-transform: uppercase;
         }
 
-        .col-tag { width: 48px; }         
+        .col-tag { width: 48px; cursor: pointer; }         
         .col-mama { width: 18%; }         
         .col-jonathan { width: 23%; cursor: pointer; }     
         .col-clara { width: 18%; }        
@@ -299,59 +298,6 @@
             background-color: transparent; 
         }
 
-        .fab-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 48px;
-            height: 48px;
-            background-color: var(--header-green);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.8rem;
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            cursor: pointer;
-            text-decoration: none;
-            z-index: 99;
-            opacity: 0.85;
-            transition: opacity 0.2s, transform 0.2s;
-            border: 2px solid white;
-        }
-        .fab-btn:hover, .fab-btn:active {
-            opacity: 1.0;
-            transform: scale(1.08);
-        }
-
-        .refresh-fab-btn {
-            position: fixed;
-            bottom: 78px;
-            right: 20px;
-            width: 48px;
-            height: 48px;
-            background-color: var(--header-green);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            cursor: pointer;
-            border: 2px solid white;
-            z-index: 99;
-            opacity: 0.85;
-            transition: opacity 0.2s, transform 0.2s;
-        }
-        .refresh-fab-btn:hover, .refresh-fab-btn:active {
-            opacity: 1.0;
-            transform: scale(1.08);
-        }
-
         .modal {
             display: none;
             position: fixed;
@@ -407,8 +353,6 @@
             th, td { font-size: 0.7rem; padding: 3px 2px; }
             thead th { font-size: 0.7rem; padding: 6px 1px; }
             .col-tag { width: 44px; }
-            .fab-btn { bottom: 15px; right: 15px; width: 48px; height: 48px; font-size: 1.8rem; }
-            .refresh-fab-btn { bottom: 72px; right: 15px; width: 48px; height: 48px; font-size: 1.5rem; }
         }
     </style>
 </head>
@@ -433,12 +377,14 @@
             <table>
                 <thead>
                     <tr>
-                        <th class="col-tag">Tag</th>
+                        <th class="col-tag" onclick="manualRefresh()" title="Kalender aktualisieren">↻</th>
                         <th class="col-mama">Mama</th>
-                        <th class="col-jonathan" onclick="openStundenplan()" title="Stundenplan anzeigen">Jonathan 📋</th>
+                        <th class="col-jonathan" onclick="openStundenplan()" title="Stundenplan anzeigen">Jonathan</th>
                         <th class="col-clara">Clara</th>
                         <th class="col-papa">Papa</th>
-                        <th class="col-geburtstag"></th>
+                        <th class="col-geburtstag" style="text-align: center;">
+                            <a href="https://calendar.google.com/calendar/render?action=TEMPLATE" target="_blank" title="Neuen Termin erstellen" style="color: white; text-decoration: none; display: block; font-size: 1.1rem; font-weight: bold;">+</a>
+                        </th>
                     </tr>
                 </thead>
                 <tbody id="calendarBody">
@@ -446,9 +392,6 @@
             </table>
         </div>
     </div>
-
-    <div class="refresh-fab-btn" onclick="manualRefresh()" title="Kalender aktualisieren">↻</div>
-    <a href="https://calendar.google.com/calendar/render?action=TEMPLATE" target="_blank" class="fab-btn" title="Neuen Termin erstellen">+</a>
 
     <!-- Wetter-Pop-Up -->
     <div id="weatherModal" class="modal" onclick="closeModal('weatherModal')">
@@ -615,15 +558,11 @@
         }
 
         function manualRefresh() {
-            const btn = document.querySelector('.refresh-fab-btn');
-            btn.style.transform = "rotate(360deg)";
-            setTimeout(() => { btn.style.transform = "none"; }, 400);
-
             fetchCalendarEvents();
         }
 
         function getCalendarDayLink(startDate) {
-            const evDate = new Date(startDate);
+            const evDate = parseLocalDate(startDate, false);
             const yyyy = evDate.getFullYear();
             const mm = String(evDate.getMonth() + 1).padStart(2, '0');
             const dd = String(evDate.getDate()).padStart(2, '0');
@@ -631,11 +570,29 @@
             return `https://calendar.google.com/calendar/r/day/${yyyy}/${mm}/${dd}`;
         }
 
-        // Robuster lokaler Datumsparser, um Zeitzonen-Verschiebungen bei ganztägigen Terminen zu verhindern
+        // Exakter lokaler Datumskonverter ohne UTC-Verschiebungsfehler
         function parseLocalDate(dateStr, isAllDay) {
-            if (isAllDay && typeof dateStr === 'string' && dateStr.includes('T')) {
-                const parts = dateStr.split('T')[0].split('-');
-                return new Date(parts[0], parts[1] - 1, parts[2]);
+            if (!dateStr) return new Date();
+            if (typeof dateStr === 'string') {
+                const datePart = dateStr.split('T')[0];
+                const parts = datePart.split('-');
+                if (parts.length === 3) {
+                    const year = parseInt(parts[0], 10);
+                    const month = parseInt(parts[1], 10) - 1;
+                    const day = parseInt(parts[2], 10);
+                    if (isAllDay || dateStr.length === 10) {
+                        return new Date(year, month, day);
+                    }
+                    const timePart = dateStr.split('T')[1];
+                    if (timePart) {
+                        const timeParts = timePart.replace('Z', '').split(':');
+                        const hour = parseInt(timeParts[0] || 0, 10);
+                        const minute = parseInt(timeParts[1] || 0, 10);
+                        const second = parseInt(timeParts[2] || 0, 10);
+                        return new Date(year, month, day, hour, minute, second);
+                    }
+                    return new Date(year, month, day);
+                }
             }
             return new Date(dateStr);
         }
