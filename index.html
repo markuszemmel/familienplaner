@@ -155,7 +155,7 @@
 
         .col-tag { width: 48px; }         
         .col-mama { width: 18%; }         
-        .col-jonathan { width: 23%; }     
+        .col-jonathan { width: 23%; cursor: pointer; }     
         .col-clara { width: 18%; }        
         .col-papa { width: 18%; }         
         .col-geburtstag { width: 18%; }   
@@ -367,8 +367,8 @@
             background-color: #fff;
             padding: 15px 20px;
             border-radius: 8px;
-            max-width: 300px;
-            width: 85%;
+            max-width: 350px;
+            width: 90%;
             text-align: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             border: 2px solid var(--header-green);
@@ -434,7 +434,7 @@
                     <tr>
                         <th class="col-tag">Tag</th>
                         <th class="col-mama">Mama</th>
-                        <th class="col-jonathan">Jonathan</th>
+                        <th class="col-jonathan" onclick="openStundenplan()" title="Stundenplan anzeigen">Jonathan 📋</th>
                         <th class="col-clara">Clara</th>
                         <th class="col-papa">Papa</th>
                         <th class="col-geburtstag"></th>
@@ -449,6 +449,7 @@
     <div class="refresh-fab-btn" onclick="manualRefresh()" title="Kalender aktualisieren">↻</div>
     <a href="https://calendar.google.com/calendar/render?action=TEMPLATE" target="_blank" class="fab-btn" title="Neuen Termin erstellen">+</a>
 
+    <!-- Wetter-Pop-Up -->
     <div id="weatherModal" class="modal" onclick="closeModal('weatherModal')">
         <div class="modal-content" onclick="event.stopPropagation()">
             <h3 id="modalDateTitle">Wetter-Vorschau</h3>
@@ -457,6 +458,7 @@
         </div>
     </div>
 
+    <!-- Geburtstags-Pop-Up -->
     <div id="bdayModal" class="modal" onclick="closeModal('bdayModal')">
         <div class="modal-content" onclick="event.stopPropagation()">
             <h3>🎂 Geburtstage (nächste 4 Wochen)</h3>
@@ -465,11 +467,21 @@
         </div>
     </div>
 
+    <!-- Nächste Termine-Pop-Up -->
     <div id="eventsModal" class="modal" onclick="closeModal('eventsModal')">
         <div class="modal-content" onclick="event.stopPropagation()">
             <h3>📅 Termine nächste 10 Tage</h3>
             <div id="eventsList" style="max-height: 270px; overflow-y: auto; margin-top: 10px;"></div>
             <button class="close-btn" onclick="closeModal('eventsModal')">Schließen</button>
+        </div>
+    </div>
+
+    <!-- Stundenplan-Pop-Up -->
+    <div id="stundenplanModal" class="modal" onclick="closeModal('stundenplanModal')">
+        <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 500px;">
+            <h3>📚 Stundenplan Jonathan</h3>
+            <img src="stundenplan.jpg" alt="Stundenplan" style="width: 100%; border-radius: 4px; margin-top: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+            <button class="close-btn" onclick="closeModal('stundenplanModal')">Schließen</button>
         </div>
     </div>
 
@@ -502,6 +514,10 @@
             fetchWeather();
             fetchCalendarEvents();
         };
+
+        function openStundenplan() {
+            document.getElementById("stundenplanModal").style.display = "flex";
+        }
 
         function fetchWeather() {
             const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max,windspeed_10m_max&timezone=Europe%2FBerlin`;
@@ -740,7 +756,6 @@
                             const finalTitleContent = timeHtml + (parsed.cleanTitle || titleText);
 
                             if (colorId === "5" || colorId === "#f6bf26" || colorId === "#fbd75b") { 
-                                // Wort "Geburtstag" ausblenden, falls vorhanden (damit nur der Name da steht)
                                 let rawBday = parsed.cleanTitle || titleText;
                                 let cleanBday = rawBday.replace(/geburtstag/gi, '').trim();
                                 let finalBdayText = cleanBday !== '' ? cleanBday : rawBday;
@@ -811,7 +826,7 @@
                     if (isToday) { row.classList.add("today-row"); row.id = "todayElement"; }
                     
                     row.innerHTML = `
-                        <td class="day-col col-tag">${firstColHtml}</td>
+                        <td class="col-tag day-col">${firstColHtml}</td>
                         <td class="col-mama">${mamaHtml}</td>
                         <td class="col-jonathan">${jonathanHtml}</td>
                         <td class="col-clara">${claraHtml}</td>
@@ -843,7 +858,9 @@
 
         function checkUpcomingBirthdays() {
             const now = new Date();
-            const in28Days = new Date();
+            now.setHours(0, 0, 0, 0);
+            
+            const in28Days = new Date(now);
             in28Days.setDate(now.getDate() + 28);
 
             let upcoming = [];
