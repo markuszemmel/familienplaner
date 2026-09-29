@@ -123,6 +123,7 @@
             border: 1px solid var(--grid-line);
             background: #fff;
             scroll-behavior: smooth;
+            padding-bottom: 90px; /* Verhindert, dass die FABs den Inhalt am Monatsende verdecken */
         }
 
         table {
@@ -630,6 +631,15 @@
             return `https://calendar.google.com/calendar/r/day/${yyyy}/${mm}/${dd}`;
         }
 
+        // Robuster lokaler Datumsparser, um Zeitzonen-Verschiebungen bei ganztägigen Terminen zu verhindern
+        function parseLocalDate(dateStr, isAllDay) {
+            if (isAllDay && typeof dateStr === 'string' && dateStr.includes('T')) {
+                const parts = dateStr.split('T')[0].split('-');
+                return new Date(parts[0], parts[1] - 1, parts[2]);
+            }
+            return new Date(dateStr);
+        }
+
         function parseMultiPerson(title) {
             let words = title.split(/\s+/);
             let persons = [];
@@ -696,8 +706,8 @@
                 }
 
                 fetchedEvents.forEach(event => {
-                    const evStart = new Date(event.start);
-                    const evEnd = new Date(event.end);
+                    const evStart = parseLocalDate(event.start, event.allDay);
+                    const evEnd = parseLocalDate(event.end, event.allDay);
 
                     if (evStart <= dayEnd && evEnd > dayStart) {
                         const titleText = event.title || "Termin";
@@ -867,10 +877,12 @@
 
             fetchedEvents.forEach(e => {
                 if (e.color === "5" || e.color === "#f6bf26" || e.color === "#fbd75b") {
-                    const evDate = new Date(e.start);
+                    const evDate = parseLocalDate(e.start, e.allDay);
+                    evDate.setHours(0, 0, 0, 0);
+
                     if (evDate >= now && evDate <= in28Days) {
-                        const dayStr = evDate.getDate().toString().padStart(2, '0');
-                        const monthStr = (evDate.getMonth() + 1).toString().padStart(2, '0');
+                        const dayStr = String(evDate.getDate()).padStart(2, '0');
+                        const monthStr = String(evDate.getMonth() + 1).padStart(2, '0');
                         
                         let rawName = e.title || "Geburtstag";
                         let cleanName = rawName.replace(/geburtstag/gi, '').trim();
@@ -910,8 +922,8 @@
                 const dayEnd = new Date(checkDate.getFullYear(), checkDate.getMonth(), checkDate.getDate(), 23, 59, 59);
 
                 const dayOfWeek = daysNames[checkDate.getDay()].substring(0, 2);
-                const dayStr = checkDate.getDate().toString().padStart(2, '0');
-                const monthStr = (checkDate.getMonth() + 1).toString().padStart(2, '0');
+                const dayStr = String(checkDate.getDate()).padStart(2, '0');
+                const monthStr = String(checkDate.getMonth() + 1).padStart(2, '0');
                 const dateHeader = `${dayOfWeek} ${dayStr}.${monthStr}.`;
 
                 let dayItems = [];
@@ -926,8 +938,8 @@
                     const isBday = e.color === "5" || e.color === "#f6bf26" || e.color === "#fbd75b";
 
                     if (!isHolidayOrFerien && !isBday) {
-                        const evStart = new Date(e.start);
-                        const evEnd = new Date(e.end);
+                        const evStart = parseLocalDate(e.start, e.allDay);
+                        const evEnd = parseLocalDate(e.end, e.allDay);
 
                         if (evStart <= dayEnd && evEnd > dayStart) {
                             const parsed = parseMultiPerson(e.title || "Termin");
