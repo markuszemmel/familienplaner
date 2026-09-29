@@ -13,8 +13,8 @@
     <style>
         :root {
             --bg-color: #f1f5f9;
-            --container-bg: #fbf9f5; /* Edler Elfenbein-Ton */
-            --grid-line: #e2d9ce;
+            --container-bg: #fcfbf9; /* Sehr helles, feines Elfenbein nahe an Weiß */
+            --grid-line: #e6dfd5;
             --header-dark: #334155; 
             --accent-color: #0f172a;
             --weekend-bg: #f5f1ea;
@@ -25,9 +25,9 @@
             --color-clara-bg: #fff5f5; --color-clara-border: #fecdd3; --color-clara-text: #881337;
             --color-papa-bg: #f8fafc; --color-papa-border: #cbd5e1; --color-papa-text: #1e293b;
             
-            /* Kontrastreichere Farben für Geburtstage und ganztägige Termine auf Elfenbein */
-            --color-geburtstag-bg: #fef08a; --color-geburtstag-border: #ca8a04; --color-geburtstag-text: #713f12;
-            --color-all-bg: #ffedd5; --color-all-border: #f97316; --color-all-text: #7c2d12;
+            /* Etwas blassere, harmonischere Töne für Geburtstage und ganztägige Termine */
+            --color-geburtstag-bg: #fef9c3; --color-geburtstag-border: #eab308; --color-geburtstag-text: #713f12;
+            --color-all-bg: #ffedd5; --color-all-border: #fb923c; --color-all-text: #7c2d12;
         }
 
         body {
@@ -180,7 +180,7 @@
 
         .day-col {
             text-align: center;
-            background-color: #f2ece1;
+            background-color: #f3efe6;
             font-weight: 600;
             color: #334155;
             position: relative;
@@ -249,7 +249,7 @@
             cursor: pointer;
             padding: 1px;
             border-radius: 3px;
-            background: rgba(251,249,245,0.95);
+            background: rgba(252,251,249,0.95);
             display: inline-block;
         }
         .weather-info:hover {
@@ -329,7 +329,7 @@
             align-items: center;
         }
         .modal-content {
-            background-color: #fbf9f5;
+            background-color: #fcfbf9;
             padding: 20px;
             border-radius: 12px;
             max-width: 350px;
@@ -425,7 +425,7 @@
     <!-- Geburtstags-Pop-Up -->
     <div id="bdayModal" class="modal" onclick="closeModal('bdayModal')">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <h3>🎂 Geburtstage (nächste 4 Wochen)</h3>
+            <h3>🎂 Geburtstage (nächste 8 Wochen)</h3>
             <div id="bdayList" style="max-height: 250px; overflow-y: auto; margin-top: 10px;"></div>
             <button class="close-btn" onclick="closeModal('bdayModal')">Schließen</button>
         </div>
@@ -515,7 +515,7 @@
         function getWeatherIcon(code) {
             if (code === 0) return "☀️";
             if (code >= 1 && code <= 3) return "⛅";
-            if (code >= 45 && code <= 48) return "🌫️";
+            if (code >= 45 && code <= 48) return "🌫️️";
             if (code >= 51 && code <= 67) return "🌧️";
             if (code >= 71 && code <= 77) return "❄️";
             if (code >= 80 && code <= 82) return "🌦️";
@@ -820,8 +820,8 @@
             const now = new Date();
             now.setHours(0, 0, 0, 0);
             
-            const in28Days = new Date(now);
-            in28Days.setDate(now.getDate() + 28);
+            const in56Days = new Date(now);
+            in56Days.setDate(now.getDate() + 56);
 
             let upcoming = [];
 
@@ -830,7 +830,7 @@
                     const evDate = new Date(e.start);
                     evDate.setHours(0, 0, 0, 0);
 
-                    if (evDate >= now && evDate <= in28Days) {
+                    if (evDate >= now && evDate <= in56Days) {
                         const dayStr = String(evDate.getDate()).padStart(2, '0');
                         const monthStr = String(evDate.getMonth() + 1).padStart(2, '0');
                         
@@ -847,7 +847,7 @@
 
             const listContainer = document.getElementById("bdayList");
             if (upcoming.length === 0) {
-                listContainer.innerHTML = `<div style="font-size:0.85rem; color:#666; padding:10px;">In den nächsten 4 Wochen stehen keine Geburtstage an.</div>`;
+                listContainer.innerHTML = `<div style="font-size:0.85rem; color:#666; padding:10px;">In den nächsten 8 Wochen stehen keine Geburtstage an.</div>`;
             } else {
                 let html = "";
                 upcoming.forEach(item => {
