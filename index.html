@@ -8,18 +8,18 @@
         :root {
             --bg-color: #f1f5f9;
             --container-bg: #ffffff;
-            --grid-line: #e2e8f0;
-            --header-dark: #64748b; /* Nochmals deutlich heller & leichter */
+            --grid-line: #cbd5e1;
+            --header-dark: #334155; /* Kräftiger & kontrastreicher */
             --accent-color: #0f172a;
             --weekend-bg: #f8fafc;
             --today-bg: #fefce8;
 
-            --color-mama-bg: #f5f7ff; --color-mama-border: #e0e7ff; --color-mama-text: #3730a3;
-            --color-jonathan-bg: #fdf4ff; --color-jonathan-border: #f3e8ff; --color-jonathan-text: #86198f;
-            --color-clara-bg: #fff5f5; --color-clara-border: #ffe3e3; --color-clara-text: #9f1239;
-            --color-papa-bg: #f8fafc; --color-papa-border: #e2e8f0; --color-papa-text: #334155;
-            --color-geburtstag-bg: #fefce8; --color-geburtstag-border: #fef08a; --color-geburtstag-text: #854d0e;
-            --color-all-bg: #fff7ed; --color-all-border: #fed7aa; --color-all-text: #9a3412;
+            --color-mama-bg: #f5f7ff; --color-mama-border: #c7d2fe; --color-mama-text: #312e81;
+            --color-jonathan-bg: #fdf4ff; --color-jonathan-border: #f5d0fe; --color-jonathan-text: #701a75;
+            --color-clara-bg: #fff5f5; --color-clara-border: #fecdd3; --color-clara-text: #881337;
+            --color-papa-bg: #f8fafc; --color-papa-border: #cbd5e1; --color-papa-text: #1e293b;
+            --color-geburtstag-bg: #fefce8; --color-geburtstag-border: #fde047; --color-geburtstag-text: #713f12;
+            --color-all-bg: #fff7ed; --color-all-border: #fed7aa; --color-all-text: #7c2d12;
         }
 
         body {
@@ -37,7 +37,7 @@
             max-width: 1250px;
             border: 1px solid var(--grid-line);
             border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
             padding: 8px;
             position: relative;
         }
@@ -68,9 +68,9 @@
         }
 
         .nav-btn {
-            background-color: #f1f5f9;
+            background-color: #f8fafc;
             color: var(--header-dark);
-            border: 1px solid #cbd5e1;
+            border: 1px solid #94a3b8;
             padding: 5px 10px;
             border-radius: 6px;
             cursor: pointer;
@@ -174,7 +174,7 @@
             text-align: center;
             background-color: #f8fafc;
             font-weight: 600;
-            color: #475569;
+            color: #334155;
             position: relative;
         }
 
@@ -185,19 +185,19 @@
             background-color: #f1f5f9;
         }
 
-        /* Sehr dezent gehaltenes Feiertags-Grün (analog zu den Termin-Boxen) */
         tr.holiday-row td {
-            background-color: #f6fdf9 !important; 
+            background-color: #f0fdf4 !important; 
         }
         tr.holiday-row .day-col {
-            background-color: #f0fdf4 !important;
+            background-color: #dcfce7 !important;
+            color: #065f46;
         }
         .holiday-label {
             font-size: 0.48rem;
             color: #047857;
             margin-top: 1px;
             line-height: 1.1;
-            font-weight: 600;
+            font-weight: 700;
             word-break: break-word;
         }
 
@@ -206,7 +206,7 @@
         }
         tr.today-row .day-col {
             background-color: #fef08a !important;
-            color: #854d0e;
+            color: #713f12;
             border-left: 3px solid #d97706;
         }
 
@@ -227,7 +227,7 @@
 
         .date-day {
             font-size: 0.58rem;
-            color: #64748b;
+            color: #475569;
             display: block;
             text-transform: uppercase;
         }
@@ -237,11 +237,11 @@
             color: var(--header-dark);
             margin-top: 1px;
             line-height: 1;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             padding: 1px;
             border-radius: 3px;
-            background: rgba(255,255,255,0.8);
+            background: rgba(255,255,255,0.9);
             display: inline-block;
         }
         .weather-info:hover {
@@ -259,6 +259,7 @@
             margin-bottom: 2px;
             line-height: 1.2;
             text-decoration: none;
+            font-weight: 500;
             transition: opacity 0.15s;
         }
         .appointment:hover { opacity: 0.85; }
@@ -267,7 +268,7 @@
         .appointment.jonathan { background: var(--color-jonathan-bg); border-color: var(--color-jonathan-border); color: var(--color-jonathan-text); }
         .appointment.clara { background: var(--color-clara-bg); border-color: var(--color-clara-border); color: var(--color-clara-text); }
         .appointment.papa { background: var(--color-papa-bg); border-color: var(--color-papa-border); color: var(--color-papa-text); }
-        .appointment.geburtstag { background: var(--color-geburtstag-bg); border-color: var(--color-geburtstag-border); color: var(--color-geburtstag-text); font-weight: 600; }
+        .appointment.geburtstag { background: var(--color-geburtstag-bg); border-color: var(--color-geburtstag-border); color: var(--color-geburtstag-text); font-weight: 700; }
 
         .appointment-all {
             display: block;
@@ -277,7 +278,7 @@
             padding: 3px 4px;
             font-size: 0.68rem;
             border-radius: 5px;
-            font-weight: 600;
+            font-weight: 700;
             text-align: center;
             margin-bottom: 2px;
             line-height: 1.2;
@@ -288,8 +289,8 @@
 
         .time-badge {
             font-size: 0.55rem; 
-            font-weight: 600; 
-            opacity: 0.8; 
+            font-weight: 700; 
+            opacity: 0.85; 
             display: block; 
             margin-bottom: 1px;
         }
@@ -337,7 +338,7 @@
         .modal-item {
             font-size: 0.82rem;
             margin: 8px 0;
-            color: #334155;
+            color: #1e293b;
             text-align: left;
             border-bottom: 1px solid #f1f5f9;
             padding-bottom: 6px;
@@ -897,7 +898,7 @@
                             }
 
                             let timeStr = "";
-                            if (!event.allDay) {
+                            if (!e.allDay) {
                                 const hh = String(evStart.getHours()).padStart(2, '0');
                                 const mm = String(evStart.getMinutes()).padStart(2, '0');
                                 timeStr = ` (🕒 ${hh}:${mm})`;
