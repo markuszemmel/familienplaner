@@ -14,11 +14,11 @@
             --weekend-bg: #f8fafc;
             --today-bg: #fefce8;
 
-            --color-mama-bg: #eef2ff; --color-mama-border: #c7d2fe; --color-mama-text: #3730a3;
-            --color-jonathan-bg: #fdf4ff; --color-jonathan-border: #f5d0fe; --color-jonathan-text: #86198f;
-            --color-clara-bg: #fff1f2; --color-clara-border: #fecdd3; --color-clara-text: #9f1239;
-            --color-papa-bg: #f1f5f9; --color-papa-border: #cbd5e1; --color-papa-text: #334155;
-            --color-geburtstag-bg: #fefce8; --color-geburtstag-border: #fde047; --color-geburtstag-text: #854d0e;
+            --color-mama-bg: #f5f7ff; --color-mama-border: #e0e7ff; --color-mama-text: #3730a3;
+            --color-jonathan-bg: #fdf4ff; --color-jonathan-border: #f3e8ff; --color-jonathan-text: #86198f;
+            --color-clara-bg: #fff5f5; --color-clara-border: #ffe3e3; --color-clara-text: #9f1239;
+            --color-papa-bg: #f8fafc; --color-papa-border: #e2e8f0; --color-papa-text: #334155;
+            --color-geburtstag-bg: #fefce8; --color-geburtstag-border: #fef08a; --color-geburtstag-text: #854d0e;
             --color-all-bg: #fff7ed; --color-all-border: #fed7aa; --color-all-text: #9a3412;
         }
 
@@ -26,7 +26,7 @@
             background-color: var(--bg-color);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
-            padding: 8px;
+            padding: 4px;
             display: flex;
             justify-content: center;
         }
@@ -36,22 +36,22 @@
             width: 100%;
             max-width: 1250px;
             border: 1px solid var(--grid-line);
-            border-radius: 12px;
+            border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-            padding: 12px;
+            padding: 8px;
             position: relative;
         }
 
         header {
             text-align: center;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             border-bottom: 1px solid var(--grid-line);
-            padding-bottom: 10px;
+            padding-bottom: 8px;
         }
 
         h1 {
-            margin: 0 0 8px 0;
-            font-size: 1.25rem;
+            margin: 0 0 6px 0;
+            font-size: 1.2rem;
             color: var(--header-dark);
             letter-spacing: 0.5px;
             font-weight: 700;
@@ -62,8 +62,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 8px;
-            margin-top: 6px;
+            gap: 6px;
+            margin-top: 4px;
             width: 100%;
         }
 
@@ -71,10 +71,10 @@
             background-color: #f1f5f9;
             color: var(--header-dark);
             border: 1px solid #cbd5e1;
-            padding: 6px 12px;
+            padding: 5px 10px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             font-weight: 600;
             white-space: nowrap;
             transition: background 0.2s;
@@ -84,8 +84,8 @@
         .action-buttons-row {
             display: flex;
             justify-content: center;
-            gap: 6px;
-            margin-top: 10px;
+            gap: 5px;
+            margin-top: 8px;
             flex-wrap: wrap;
         }
 
@@ -93,10 +93,10 @@
             background-color: var(--header-dark);
             color: white;
             border: none;
-            padding: 6px 12px;
+            padding: 5px 10px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             font-weight: 600;
             transition: opacity 0.2s;
         }
@@ -106,17 +106,17 @@
             background-color: #d97706;
             color: white;
             border: none;
-            padding: 6px 12px;
+            padding: 5px 10px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             font-weight: 600;
             transition: opacity 0.2s;
         }
         .today-btn-orange:hover { opacity: 0.9; }
 
         .month-title {
-            font-size: 1.05rem;
+            font-size: 1rem;
             font-weight: 700;
             color: var(--header-dark);
             text-align: center;
@@ -127,7 +127,7 @@
             max-height: 75vh;
             overflow-y: auto;
             border: 1px solid var(--grid-line);
-            border-radius: 8px;
+            border-radius: 6px;
             background: #fff;
             scroll-behavior: smooth;
         }
@@ -141,11 +141,13 @@
 
         th, td {
             border: 1px solid var(--grid-line);
-            padding: 5px 6px;
+            padding: 4px 3px;
             vertical-align: middle;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             word-break: break-word;
             overflow-wrap: break-word;
+            hyphens: auto;
+            -webkit-hyphens: auto;
         }
 
         thead th {
@@ -155,18 +157,18 @@
             background-color: var(--header-dark);
             color: white;
             text-align: center;
-            font-size: 0.78rem;
-            padding: 8px 2px;
+            font-size: 0.75rem;
+            padding: 7px 1px;
             font-weight: 600;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.2px;
         }
 
-        .col-tag { width: 46px; cursor: pointer; text-align: center; }         
-        .col-mama { width: 18%; }         
-        .col-jonathan { width: 23%; cursor: pointer; }     
-        .col-clara { width: 18%; }        
-        .col-papa { width: 18%; }         
-        .col-geburtstag { width: 18%; }   
+        .col-tag { width: 40px; cursor: pointer; text-align: center; }         
+        .col-mama { width: 18.5%; }         
+        .col-jonathan { width: 22%; cursor: pointer; }     
+        .col-clara { width: 18.5%; }        
+        .col-papa { width: 18.5%; }         
+        .col-geburtstag { width: 18.5%; }   
 
         .day-col {
             text-align: center;
@@ -201,35 +203,35 @@
 
         .wooden-peg {
             display: inline-block;
-            width: 10px;
-            height: 12px;
+            width: 9px;
+            height: 11px;
             vertical-align: middle;
             margin-right: 1px;
         }
 
         .date-num {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             display: inline-block;
             vertical-align: middle;
             font-weight: 700;
         }
 
         .date-day {
-            font-size: 0.62rem;
+            font-size: 0.58rem;
             color: #64748b;
             display: block;
             text-transform: uppercase;
         }
 
         .weather-info {
-            font-size: 0.58rem;
+            font-size: 0.55rem;
             color: var(--header-dark);
-            margin-top: 2px;
+            margin-top: 1px;
             line-height: 1;
             font-weight: 600;
             cursor: pointer;
-            padding: 2px;
-            border-radius: 4px;
+            padding: 1px;
+            border-radius: 3px;
             background: rgba(255,255,255,0.8);
             display: inline-block;
         }
@@ -238,9 +240,9 @@
         }
 
         .holiday-label {
-            font-size: 0.5rem;
+            font-size: 0.48rem;
             color: #6b21a8;
-            margin-top: 2px;
+            margin-top: 1px;
             line-height: 1.1;
             font-weight: 600;
             word-break: break-word;
@@ -251,11 +253,11 @@
             background: var(--color-papa-bg);
             border: 1px solid var(--color-papa-border);
             color: var(--color-papa-text);
-            padding: 4px 6px;
-            font-size: 0.7rem;
-            border-radius: 6px;
-            margin-bottom: 3px;
-            line-height: 1.25;
+            padding: 3px 4px;
+            font-size: 0.68rem;
+            border-radius: 5px;
+            margin-bottom: 2px;
+            line-height: 1.2;
             text-decoration: none;
             transition: opacity 0.15s;
         }
@@ -272,20 +274,20 @@
             background: var(--color-all-bg);
             border: 1px solid var(--color-all-border);
             color: var(--color-all-text);
-            padding: 4px 6px;
-            font-size: 0.7rem;
-            border-radius: 6px;
+            padding: 3px 4px;
+            font-size: 0.68rem;
+            border-radius: 5px;
             font-weight: 600;
             text-align: center;
-            margin-bottom: 3px;
-            line-height: 1.25;
+            margin-bottom: 2px;
+            line-height: 1.2;
             text-decoration: none;
             transition: opacity 0.15s;
         }
         .appointment-all:hover { opacity: 0.85; }
 
         .time-badge {
-            font-size: 0.58rem; 
+            font-size: 0.55rem; 
             font-weight: 600; 
             opacity: 0.8; 
             display: block; 
@@ -295,12 +297,12 @@
         .shared-row-cell {
             background-color: transparent; 
             border-bottom: none !important;
-            padding-bottom: 2px;
+            padding-bottom: 1px;
         }
         
         .individual-row-cell {
             border-top: none !important;
-            padding-top: 2px;
+            padding-top: 1px;
             background-color: transparent; 
         }
 
@@ -357,11 +359,11 @@
 
         @media (max-width: 600px) {
             body { padding: 0; }
-            .calendar-card { border: none; border-radius: 0; padding: 6px; box-shadow: none; }
-            h1 { font-size: 1.1rem; }
-            th, td { font-size: 0.68rem; padding: 3px 3px; }
-            thead th { font-size: 0.68rem; padding: 6px 1px; }
-            .col-tag { width: 42px; }
+            .calendar-card { border: none; border-radius: 0; padding: 4px; box-shadow: none; }
+            h1 { font-size: 1.05rem; }
+            th, td { font-size: 0.64rem; padding: 2px 1px; }
+            thead th { font-size: 0.65rem; padding: 5px 1px; }
+            .col-tag { width: 36px; }
         }
     </style>
 </head>
