@@ -9,7 +9,7 @@
             --bg-color: #f1f5f9;
             --container-bg: #ffffff;
             --grid-line: #e2e8f0;
-            --header-dark: #1e293b;
+            --header-dark: #334155; /* Etwas heller & weicher */
             --accent-color: #0f172a;
             --weekend-bg: #f8fafc;
             --today-bg: #fefce8;
@@ -185,11 +185,20 @@
             background-color: #f1f5f9;
         }
 
+        /* NEU: Dezent hellgrüner / mintfarbener Ton für Feiertage & Ferien (kein Konflikt mit Jonathan) */
         tr.holiday-row td {
-            background-color: #faf5ff !important; 
+            background-color: #f0fdf4 !important; 
         }
         tr.holiday-row .day-col {
-            background-color: #f3e8ff !important;
+            background-color: #dcfce7 !important;
+        }
+        .holiday-label {
+            font-size: 0.48rem;
+            color: #047857;
+            margin-top: 1px;
+            line-height: 1.1;
+            font-weight: 600;
+            word-break: break-word;
         }
 
         tr.today-row td {
@@ -237,15 +246,6 @@
         }
         .weather-info:hover {
             background: #e2e8f0;
-        }
-
-        .holiday-label {
-            font-size: 0.48rem;
-            color: #6b21a8;
-            margin-top: 1px;
-            line-height: 1.1;
-            font-weight: 600;
-            word-break: break-word;
         }
 
         .appointment {
